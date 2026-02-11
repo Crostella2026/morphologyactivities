@@ -1,0 +1,2597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morphology Extension Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Cabin:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF6B35;
+            --secondary: #004E89;
+            --accent: #F7B801;
+            --success: #06A77D;
+            --purple: #9B51E0;
+            --bg: #FFF8F0;
+            --card: #FFFFFF;
+            --text: #2D3142;
+        }
+
+        body {
+            font-family: 'Cabin', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(255, 107, 53, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 78, 137, 0.08) 0%, transparent 50%);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        h1 {
+            font-family: 'Bubblegum Sans', cursive;
+            font-size: 3.5rem;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            text-shadow: 4px 4px 0px var(--accent);
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .home-view {
+            display: block;
+        }
+
+        .home-view.hidden {
+            display: none;
+        }
+
+        .group-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .group-card {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: 25px;
+            box-shadow: 0 10px 40px rgba(0, 78, 137, 0.15);
+            border: 4px solid transparent;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            animation: fadeInUp 0.6s ease-out both;
+        }
+
+        .group-card:nth-child(1) { animation-delay: 0.1s; border-color: #FF6B35; }
+        .group-card:nth-child(2) { animation-delay: 0.2s; border-color: #F7B801; }
+        .group-card:nth-child(3) { animation-delay: 0.3s; border-color: #9B51E0; }
+
+        .group-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0, 78, 137, 0.25);
+        }
+
+        .group-card h3 {
+            font-family: 'Bubblegum Sans', cursive;
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .group-card:nth-child(1) h3 { color: #FF6B35; }
+        .group-card:nth-child(2) h3 { color: #F7B801; }
+        .group-card:nth-child(3) h3 { color: #9B51E0; }
+
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .week-button {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white;
+            border: none;
+            padding: 1.2rem;
+            border-radius: 18px;
+            font-size: 1.1rem;
+            font-family: 'Cabin', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .week-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .week-button:hover::before {
+            left: 100%;
+        }
+
+        .week-button:hover {
+            transform: scale(1.08);
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.5);
+        }
+
+        .week-button:active {
+            transform: scale(0.98);
+        }
+
+        /* Activity View */
+        .activity-view {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .activity-view.active {
+            display: block;
+        }
+
+        .back-button {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-family: 'Cabin', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 78, 137, 0.3);
+        }
+
+        .back-button:hover {
+            background: var(--primary);
+            transform: translateX(-8px);
+        }
+
+        .activity-header {
+            background: linear-gradient(135deg, var(--secondary), var(--purple));
+            color: white;
+            padding: 2rem;
+            border-radius: 25px;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 78, 137, 0.2);
+        }
+
+        .activity-header h2 {
+            font-family: 'Bubblegum Sans', cursive;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .activity-header p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+        }
+
+        .section-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tab-button {
+            background: white;
+            border: 3px solid var(--accent);
+            padding: 1rem 2rem;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Cabin', sans-serif;
+            color: var(--text);
+        }
+
+        .tab-button:hover {
+            background: var(--accent);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(247, 184, 1, 0.3);
+        }
+
+        .tab-button.active {
+            background: var(--accent);
+            color: var(--text);
+            box-shadow: 0 8px 20px rgba(247, 184, 1, 0.4);
+        }
+
+        .section-content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .section-content.active {
+            display: block;
+        }
+
+        .teaching-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 25px;
+            box-shadow: 0 8px 30px rgba(0, 78, 137, 0.1);
+            margin-bottom: 2rem;
+            border-left: 8px solid var(--primary);
+        }
+
+        .teaching-box h3 {
+            color: var(--secondary);
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            font-family: 'Bubblegum Sans', cursive;
+        }
+
+        .teaching-box p {
+            line-height: 1.8;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .fact-highlight {
+            background: linear-gradient(120deg, rgba(247, 184, 1, 0.2), rgba(255, 107, 53, 0.2));
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            margin: 1rem 0;
+            border-left: 5px solid var(--accent);
+            font-weight: 600;
+        }
+
+        .game-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 25px;
+            box-shadow: 0 8px 30px rgba(0, 78, 137, 0.1);
+            margin-top: 1.5rem;
+        }
+
+        .game-container h4 {
+            color: var(--purple);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-family: 'Bubblegum Sans', cursive;
+            text-align: center;
+        }
+
+        .word-tiles {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .word-tile {
+            background: linear-gradient(135deg, var(--accent), #FFD166);
+            color: var(--text);
+            padding: 1.2rem;
+            border-radius: 15px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(247, 184, 1, 0.3);
+            user-select: none;
+        }
+
+        .word-tile {
+            background: linear-gradient(135deg, var(--accent), #FFB84D);
+            color: var(--text);
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(247, 184, 1, 0.3);
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .word-tile:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(247, 184, 1, 0.4);
+        }
+        
+        .word-tile:active {
+            transform: scale(0.98);
+        }
+        
+        /* iPad touch improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .word-tile {
+                transition: none;
+            }
+            
+            .word-tile:hover {
+                transform: none;
+            }
+            
+            .word-tile:active {
+                transform: scale(0.95);
+                background: linear-gradient(135deg, var(--purple), #7B3BB0);
+                color: white;
+            }
+            
+            .tab-button:active {
+                transform: translateY(-3px);
+            }
+            
+            .morpheme-chip:active {
+                transform: scale(1.15);
+            }
+        }
+
+        .word-tile.selected {
+            background: linear-gradient(135deg, var(--success), #38B583);
+            color: white;
+        }
+
+        .word-tile.incorrect {
+            background: linear-gradient(135deg, #E74C3C, #C0392B);
+            color: white;
+            animation: shake 0.5s;
+        }
+
+        .morpheme-breakdown {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background: rgba(247, 184, 1, 0.1);
+            border-radius: 15px;
+            min-height: 80px;
+            align-items: center;
+        }
+
+        .morpheme-part {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .morpheme-part.prefix {
+            background: linear-gradient(135deg, #FF6B35, #FF8C61);
+            color: white;
+        }
+
+        .morpheme-part.root {
+            background: linear-gradient(135deg, #004E89, #0066B3);
+            color: white;
+        }
+
+        .morpheme-part.suffix {
+            background: linear-gradient(135deg, #9B51E0, #B57FED);
+            color: white;
+        }
+
+        .definition-reveal {
+            background: linear-gradient(135deg, rgba(6, 167, 125, 0.15), rgba(6, 167, 125, 0.25));
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-top: 1rem;
+            border: 3px solid var(--success);
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: none;
+            animation: slideDown 0.4s ease-out;
+        }
+
+        .definition-reveal.show {
+            display: block;
+        }
+
+        .quiz-option {
+            background: white;
+            border: 3px solid var(--secondary);
+            padding: 1.2rem;
+            border-radius: 15px;
+            margin: 0.8rem 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .quiz-option:hover {
+            background: rgba(0, 78, 137, 0.1);
+            transform: translateX(10px);
+        }
+
+        .quiz-option.correct {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+            animation: pulse 0.5s;
+        }
+
+        .quiz-option.wrong {
+            background: #E74C3C;
+            color: white;
+            border-color: #E74C3C;
+            animation: shake 0.5s;
+        }
+
+        .score-display {
+            background: linear-gradient(135deg, var(--purple), #B57FED);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 1.5rem 0;
+            box-shadow: 0 6px 20px rgba(155, 81, 224, 0.3);
+        }
+
+        .try-again-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 18px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Cabin', sans-serif;
+            margin-top: 1rem;
+        }
+
+        .try-again-btn:hover {
+            background: var(--secondary);
+            transform: scale(1.08);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .week-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .group-selector {
+                grid-template-columns: 1fr;
+            }
+
+            .section-tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌟 Word Explorer Hub 🌟</h1>
+            <p class="subtitle">Discover the Magic of Morphology!</p>
+        </header>
+
+        <div id="homeView" class="home-view">
+            <div class="group-selector" id="groupSelector"></div>
+        </div>
+
+        <div id="activityView" class="activity-view">
+            <button class="back-button" onclick="goHome()">← Back to Week Selection</button>
+            <div id="activityContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Morphology Data
+        const MORPHOLOGY_DATA = {
+            '1-2': {
+                title: 'a as /ai/ - Long A Sound Pattern',
+                
+                quickGames: `
+                    <div class="teaching-box">
+                        <h3>📖 Quick Lesson: The Magic "a"</h3>
+                        <p>When "a" appears in certain words, it makes the long /ai/ sound like in "cake" or "make". This often happens in words with a silent 'e' at the end (a-consonant-e pattern) or in open syllables.</p>
+                        <div class="fact-highlight">
+                            🎯 Key Pattern: Look for a + consonant + silent e (like: make, take, gate)
+                        </div>
+                    </div>
+                    
+                    <div class="game-container">
+                        <h4>🎯 Sound Sorting Challenge!</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Drag words to the correct bucket: Does "a" make the /ai/ sound?</p>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 1.5rem;">
+                            <div>
+                                <div style="background: rgba(6, 167, 125, 0.2); padding: 1rem; border-radius: 15px; border: 3px solid var(--success); min-height: 200px;" 
+                                     id="yesBox1"
+                                     ondragover="allowDrop(event)" 
+                                     ondrop="drop(event, 'yes')">
+                                    <h4 style="text-align: center; color: var(--success); margin-bottom: 1rem;">✓ YES - /ai/ sound</h4>
+                                    <div id="yesWords1" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="background: rgba(255, 107, 53, 0.2); padding: 1rem; border-radius: 15px; border: 3px solid var(--primary); min-height: 200px;" 
+                                     id="noBox1"
+                                     ondragover="allowDrop(event)" 
+                                     ondrop="drop(event, 'no')">
+                                    <h4 style="text-align: center; color: var(--primary); margin-bottom: 1rem;">✗ NO - different sound</h4>
+                                    <div id="noWords1" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="background: rgba(247, 184, 1, 0.15); padding: 1rem; border-radius: 15px; margin-bottom: 1rem;">
+                            <p style="text-align: center; font-weight: 600; margin-bottom: 1rem;">Words to Sort:</p>
+                            <div id="wordBank1" style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;"></div>
+                        </div>
+                        
+                        <button class="check-button" onclick="checkSorting1()" style="width: 100%;">Check My Sorting!</button>
+                        <div class="score-display" id="sortScore" style="display: none; margin-top: 1rem;"></div>
+                    </div>
+                `,
+                
+                etymology: `
+                    <div class="teaching-box">
+                        <h3>🏛️ Word Origins: Where Does the /ai/ Sound Come From?</h3>
+                        <p>Many English words with the long 'a' sound come from Old English and Latin roots. The silent 'e' pattern was introduced by French scribes after the Norman Conquest in 1066!</p>
+                        
+                        <div class="fact-highlight">
+                            🌍 Fun Fact: The word "make" comes from Old English "macian". The silent 'e' was added later to show the vowel was long!
+                        </div>
+                        
+                        <p><strong>Common word families with /ai/:</strong></p>
+                        <ul style="margin-left: 2rem; line-height: 2;">
+                            <li><strong>-ate family:</strong> create, relate, translate (from Latin "-atus")</li>
+                            <li><strong>-ake family:</strong> make, take, bake (from Old English)</li>
+                            <li><strong>-ade family:</strong> parade, arcade (from French)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="game-container">
+                        <h4>🌟 Origin Detective!</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Match each word to where it came from:</p>
+                        <div id="etymologyQuiz1"></div>
+                    </div>
+                `,
+                
+                morphology: `
+                    <div class="teaching-box">
+                        <h3>🔬 Morphology Master: Building Words with /ai/</h3>
+                        <p>A <strong>morpheme</strong> is the smallest unit of meaning. Let's explore how prefixes and suffixes work with words containing the /ai/ sound!</p>
+                        
+                        <div class="fact-highlight">
+                            💡 Prefix + Base + Suffix = New Word!<br>
+                            Example: re- + late = relate<br>
+                            Example: re- + late + -ion = relation
+                        </div>
+                        
+                        <p><strong>Common patterns:</strong></p>
+                        <ul style="margin-left: 2rem; line-height: 2;">
+                            <li><strong>re-</strong> (again): remake, retake, recreate</li>
+                            <li><strong>un-</strong> (not): unsafe, unable, unmade</li>
+                            <li><strong>-er</strong> (one who): maker, baker, skater</li>
+                            <li><strong>-ing</strong> (action): making, taking, creating</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="game-container">
+                        <h4>🎨 Word Building Lab</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Click on a word to see it broken into morphemes and learn its meaning!</p>
+                        <div class="word-tiles" id="morphemeBuilder1"></div>
+                        <div class="morpheme-breakdown" id="breakdown1"></div>
+                        <div class="definition-reveal" id="definition1"></div>
+                    </div>
+                `,
+                
+                puzzles: `
+                    <div class="teaching-box">
+                        <h3>🧩 Morpheme Matching Game</h3>
+                        <p>Drag the morphemes together to build real words! Can you make all 5 words?</p>
+                        <div class="fact-highlight">
+                            💡 Tip: Prefixes go at the start, suffixes at the end!
+                        </div>
+                    </div>
+                    
+                    <div class="game-container">
+                        <h4>🎯 Build the Words!</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Drag and drop morphemes to create words:</p>
+                        
+                        <div style="background: rgba(247, 184, 1, 0.1); padding: 1.5rem; border-radius: 15px; margin-bottom: 1rem;">
+                            <p style="text-align: center; font-weight: 600; margin-bottom: 1rem;">Available Morphemes:</p>
+                            <div id="morphemeBank1" style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;"></div>
+                        </div>
+                        
+                        <div style="background: rgba(6, 167, 125, 0.1); padding: 1.5rem; border-radius: 15px;">
+                            <p style="text-align: center; font-weight: 600; margin-bottom: 1rem;">Build Your Words Here:</p>
+                            <div id="buildZone1"></div>
+                        </div>
+                        
+                        <div id="puzzleScore1" style="margin-top: 1rem;"></div>
+                    </div>
+                `
+            },
+            
+            '2-2': {
+                title: 'Prefix micro- (Small & Tiny)',
+                
+                quickGames: `
+                    <div class="teaching-box">
+                        <h3>📖 Quick Lesson: The Mighty Micro-!</h3>
+                        <p>The prefix <strong>micro-</strong> comes from Greek and means "small" or "tiny". It's used in science, technology, and everyday language to describe very small things.</p>
+                        <div class="fact-highlight">
+                            🔬 Scientific Connection: micro- = one millionth! (1 micrometer = 0.000001 meters)
+                        </div>
+                        <p><strong>Common uses:</strong> microscope (small viewer), microphone (small sound), microchip (small computer chip)</p>
+                    </div>
+                    
+                    <div class="game-container">
+                        <h4>⚡ Micro Hunt!</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Race against the clock! Click all the REAL micro- words as fast as you can!</p>
+                        
+                        <div style="background: rgba(155, 81, 224, 0.1); padding: 1.5rem; border-radius: 15px; text-align: center; margin-bottom: 1rem;">
+                            <div style="font-size: 2rem; font-weight: 700; color: var(--purple);" id="microTimer">⏱️ 0.0s</div>
+                            <div style="font-size: 1.2rem; font-weight: 600; margin-top: 0.5rem; color: var(--success);" id="microCounter">Found: 0/5</div>
+                        </div>
+                        
+                        <div class="word-tiles" id="microSort"></div>
+                        <div class="score-display" id="microScore" style="display: none;"></div>
+                    </div>
+                `,
+                
+                etymology: `
+                    <div class="teaching-box">
+                        <h3>🏛️ Ancient Greek Origins</h3>
+                        <p>The prefix "micro-" comes from the ancient Greek word "μικρός" (mikros), meaning small or little. The ancient Greeks used this word in everyday conversation!</p>
+                        
+                        <div class="fact-highlight">
+                            🌟 Historical Fact: The microscope was invented in the 1590s by combining "micro" (small) + "scope" (to look). Before this, people didn't know tiny organisms existed!
+                        </div>
+                        
+                        <p><strong>Greek Root Breakdown:</strong></p>
+                        <ul style="margin-left: 2rem; line-height: 2;">
+                            <li><strong>micro-</strong> = small (Greek: mikros)</li>
+                            <li><strong>-scope</strong> = to see/look (Greek: skopein)</li>
+                            <li><strong>-phone</strong> = sound/voice (Greek: phone)</li>
+                            <li><strong>-organism</strong> = living thing (Greek: organon + -ismos)</li>
+                        </ul>
+                        
+                        <p>Opposite prefix: <strong>macro-</strong> means "large" (from Greek "makros")</p>
+                    </div>
+                    
+                    <div class="game-container">
+                        <h4>🎓 Greek Roots Quiz!</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Test your knowledge of Greek word parts:</p>
+                        <div id="microEtymQuiz"></div>
+                    </div>
+                `,
+                
+                morphology: `
+                    <div>
+                        <div class="teaching-box">
+                            <h3>🔬 Building Scientific Words</h3>
+                            <p><strong>Micro-</strong> is a prefix that attaches to root words from Greek and Latin. When you see micro-, you know the word relates to something SMALL!</p>
+                            
+                            <div class="fact-highlight">
+                                💡 Formula: micro- + Greek/Latin root = scientific word<br>
+                                Examples:<br>
+                                • micro + scope (see) = microscope<br>
+                                • micro + biology (life study) = microbiology<br>
+                                • micro + wave (wave) = microwave
+                            </div>
+                            
+                            <p><strong>Breaking down micro- words:</strong></p>
+                            <ul style="margin-left: 2rem; line-height: 2;">
+                                <li><strong>microorganism:</strong> micro + organism = tiny living thing</li>
+                                <li><strong>microphone:</strong> micro + phone = device for small sounds</li>
+                                <li><strong>microchip:</strong> micro + chip = tiny computer part</li>
+                                <li><strong>microscope:</strong> micro + scope = tool to see tiny things</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="game-container">
+                            <h4>🧬 Micro- Word Builder</h4>
+                            <p style="text-align: center; margin-bottom: 1rem;">Click to see each word broken into its parts with definitions!</p>
+                            <div class="word-tiles" id="microMorphemes"></div>
+                            <div class="morpheme-breakdown" id="microBreakdown"></div>
+                            <div class="definition-reveal" id="microDefinition"></div>
+                        </div>
+                    </div>
+                `,
+                
+                puzzles: `
+                    <div class="teaching-box">
+                        <h3>🧩 Micro- Word Factory</h3>
+                        <p>Combine micro- with roots to create scientific words! Match them correctly to win!</p>
+                        <div class="fact-highlight">
+                            💡 Remember: micro- means SMALL!
+                        </div>
+                    </div>
+                    
+                    <div class="game-container">
+                        <h4>🔬 Build Scientific Words!</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Match micro- to the correct roots:</p>
+                        <div id="microPuzzle"></div>
+                    </div>
+                `
+            },
+            
+            '3-3': {
+                title: 'Suffix -ate (verb) - Action Words',
+                
+                quickGames: `
+                    <div class="teaching-box">
+                        <h3>📖 Quick Lesson: The -ate Verb Suffix</h3>
+                        <p>The suffix <strong>-ate</strong> is added to roots to create ACTION verbs. It comes from Latin and means "to make" or "to do".</p>
+                        <div class="fact-highlight">
+                            🎯 Pattern: Latin root + -ate = action verb<br>
+                            Examples: create (to make), operate (to work), celebrate (to honor)
+                        </div>
+                        <p>Most -ate verbs can transform into nouns by changing -ate to -ation!</p>
+                    </div>
+                    
+                    <div class="game-container">
+                        <h4>🎯 Rapid Fire: Verb or Not?</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Quick! Is this word an -ate VERB? You have 5 seconds per word!</p>
+                        
+                        <div id="ateGameArea"></div>
+                    </div>
+                `,
+                
+                etymology: `
+                    <div class="teaching-box">
+                        <h3>🏛️ Latin Legacy: The -ate Suffix</h3>
+                        <p>The suffix -ate comes from Latin past participle endings "-atus, -ata, -atum". When Latin speakers wanted to create verbs meaning "to do X", they used this ending!</p>
+                        
+                        <div class="fact-highlight">
+                            🌟 Ancient Rome Connection: Romans used -atus endings in verbs. When English borrowed these Latin words during the Renaissance (1400s-1600s), we kept the -ate ending!
+                        </div>
+                        
+                        <p><strong>Latin to English journey:</strong></p>
+                        <ul style="margin-left: 2rem; line-height: 2;">
+                            <li><strong>create:</strong> Latin "creare" → "creatus" → English "create"</li>
+                            <li><strong>educate:</strong> Latin "educare" → "educatus" → English "educate"</li>
+                            <li><strong>investigate:</strong> Latin "investigare" → "investigatus" → English "investigate"</li>
+                        </ul>
+                        
+                        <p><strong>The -ate to -ation transformation:</strong> When we add -ion to -ate verbs, we're using ANOTHER Latin suffix to make nouns!</p>
+                    </div>
+                    
+                    <div class="game-container">
+                        <h4>🌍 Latin Journey Quiz!</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Can you match the Latin root to its English meaning?</p>
+                        <div id="ateEtymQuiz"></div>
+                    </div>
+                `,
+                
+                morphology: `
+                    <div>
+                        <div class="teaching-box">
+                            <h3>🔬 The -ate Verb Family</h3>
+                            <p>Understanding -ate helps you build ENTIRE word families! Each -ate verb can become multiple words.</p>
+                            
+                            <div class="fact-highlight">
+                                💡 Word Family Pattern:<br>
+                                • Verb: create<br>
+                                • Noun: creation, creator, creativity<br>
+                                • Adjective: creative<br>
+                                • Adverb: creatively
+                            </div>
+                            
+                            <p><strong>Common -ate verb meanings:</strong></p>
+                            <ul style="margin-left: 2rem; line-height: 2;">
+                                <li><strong>create:</strong> Latin "creare" = to make/produce</li>
+                                <li><strong>operate:</strong> Latin "operari" = to work/perform</li>
+                                <li><strong>educate:</strong> Latin "educare" = to lead out/train</li>
+                                <li><strong>investigate:</strong> Latin "investigare" = to track/search</li>
+                                <li><strong>celebrate:</strong> Latin "celebrare" = to honor/praise</li>
+                                <li><strong>activate:</strong> Latin "activus" = to make active</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="game-container">
+                            <h4>🎨 Word Family Builder</h4>
+                            <p style="text-align: center; margin-bottom: 1rem;">Click to explore complete word families!</p>
+                            <div class="word-tiles" id="ateMorphemes"></div>
+                            <div class="morpheme-breakdown" id="ateBreakdown"></div>
+                            <div class="definition-reveal" id="ateDefinition"></div>
+                        </div>
+                    </div>
+                `,
+                
+                puzzles: `
+                    <div class="teaching-box">
+                        <h3>🧩 Word Scramble Challenge</h3>
+                        <p>Unscramble these -ate verbs as fast as you can!</p>
+                        <div class="fact-highlight">
+                            ⏱️ Beat the clock! How fast can you solve all of them?
+                        </div>
+                    </div>
+                    
+                    <div class="game-container">
+                        <h4>🎯 Unscramble the Verbs!</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Type the correct word:</p>
+                        <div id="atePuzzle"></div>
+                    </div>
+                `,
+                
+                challenge: `
+                    <div class="teaching-box">
+                        <h3>⭐ CHALLENGE ZONE: Word Family Master</h3>
+                        <p>Think you've mastered -ate verbs? This challenge will test your FULL understanding of how these verbs transform!</p>
+                        
+                        <div class="fact-highlight">
+                            🏆 Your Mission: Build complete word families by transforming -ate verbs into ALL their forms!
+                        </div>
+                    </div>
+                    
+                    <div class="game-container">
+                        <h4>🧠 Complete the Word Families!</h4>
+                        <p style="text-align: center; margin-bottom: 1.5rem;">Fill in ALL the missing forms for each verb. Type your answers and click Check!</p>
+                        
+                        <div id="challengeGame"></div>
+                    </div>
+                `
+            },
+            
+            // GROUP 1 - Remaining weeks
+            '1-3': {
+                title: 'ey as /ee/ - The EY Sound',
+                quickGames: `
+                    <div class="teaching-box">
+                        <h3>📖 Quick Lesson: EY as /ee/</h3>
+                        <p>The letter combination "ey" often makes the long /ee/ sound, especially at the end of words!</p>
+                        <div class="fact-highlight">
+                            🎯 Examples: key, monkey, honey, valley
+                        </div>
+                    </div>
+                    <div class="game-container">
+                        <h4>🎯 EY Sound Sorting!</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Drag words into the correct bucket - all these words have EY making the /ee/ sound!</p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 1.5rem;">
+                            <div><div style="background: rgba(6, 167, 125, 0.2); padding: 1rem; border-radius: 15px; border: 3px solid var(--success); min-height: 200px;" id="yesBox13" ondragover="allowDrop(event)" ondrop="drop(event, 'yes')">
+                                <h4 style="text-align: center; color: var(--success); margin-bottom: 1rem;">✓ YES - ey as /ee/</h4>
+                                <div id="yesWords13"></div>
+                            </div></div>
+                            <div><div style="background: rgba(255, 107, 53, 0.2); padding: 1rem; border-radius: 15px; border: 3px solid var(--primary); min-height: 200px;" id="noBox13" ondragover="allowDrop(event)" ondrop="drop(event, 'no')">
+                                <h4 style="text-align: center; color: var(--primary); margin-bottom: 1rem;">✗ NO - different sound</h4>
+                                <div id="noWords13"></div>
+                            </div></div>
+                        </div>
+                        <div style="background: rgba(247, 184, 1, 0.15); padding: 1rem; border-radius: 15px; margin-bottom: 1rem;">
+                            <p style="text-align: center; font-weight: 600; margin-bottom: 1rem;">Words to Sort:</p>
+                            <div id="wordBank13" style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;"></div>
+                        </div>
+                        <button class="check-button" onclick="checkSorting13()" style="width: 100%;">Check My Sorting!</button>
+                        <div class="score-display" id="sortScore13" style="display: none; margin-top: 1rem;"></div>
+                    </div>
+                `,
+                etymology: `
+                    <div class="teaching-box">
+                        <h3>🏛️ Where Does EY Come From?</h3>
+                        <p>The "ey" spelling often comes from Old English! Words like "key" trace back over 1000 years.</p>
+                        <div class="fact-highlight">
+                            🌍 Fun Fact: "Monkey" came from Spanish/Portuguese "mono" but we added "key" to make it English!
+                        </div>
+                        <p><strong>Word Origins:</strong></p>
+                        <ul style="margin-left: 2rem; line-height: 2;">
+                            <li><strong>key:</strong> Old English "cǣg"</li>
+                            <li><strong>honey:</strong> Old English "hunig"</li>
+                            <li><strong>valley:</strong> Old French "valee"</li>
+                        </ul>
+                    </div>
+                    <div class="game-container">
+                        <h4>🌟 Origin Quiz!</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Match words to their origins:</p>
+                        <div id="etymQuiz13"></div>
+                    </div>
+                `,
+                morphology: `
+                    <div class="teaching-box">
+                        <h3>🔬 Building with EY Words</h3>
+                        <p>Many EY words form compounds! Click to see the breakdown.</p>
+                        <div class="fact-highlight">
+                            💡 Compound Pattern: key + word = keyword
+                        </div>
+                        <p><strong>Common EY compounds:</strong></p>
+                        <ul style="margin-left: 2rem; line-height: 2;">
+                            <li>key + board = keyboard</li>
+                            <li>key + hole = keyhole</li>
+                            <li>key + stone = keystone</li>
+                        </ul>
+                    </div>
+                    <div class="game-container">
+                        <h4>🎨 Compound Builder!</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Click words to see how they break down:</p>
+                        <div class="word-tiles" id="morphBuilder13"></div>
+                        <div class="morpheme-breakdown" id="breakdown13"></div>
+                        <div class="definition-reveal" id="definition13"></div>
+                    </div>
+                `,
+                puzzles: `
+                    <div class="teaching-box">
+                        <h3>🧩 Compound Matching Game</h3>
+                        <p>Can you match the parts to make real compound words?</p>
+                        <div class="fact-highlight">
+                            💡 Tip: Think about words you use every day!
+                        </div>
+                    </div>
+                    <div class="game-container">
+                        <h4>🎯 Build Compounds!</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Match the word parts:</p>
+                        <div id="puzzle13"></div>
+                    </div>
+                `
+            },
+            
+            '1-4': {
+                title: 'or as /schwa/ - Unstressed OR',
+                quickGames: `<div class="teaching-box"><h3>📖 Quick Lesson: OR as schwa</h3><p>When "or" appears in unstressed syllables, it sounds like "uh" (schwa sound).</p><div class="fact-highlight">🎯 Examples: actor, doctor, editor - the "or" is barely pronounced!</div></div><div class="game-container"><h4>Speed Click!</h4><div class="word-tiles" id="game14"></div></div>`,
+                etymology: `<div class="teaching-box"><h3>🏛️ Latin Agent Nouns</h3><p>Most -or words come from Latin and mean "one who does something"</p><div class="fact-highlight">⚡ actor = one who acts, doctor = one who teaches/heals</div></div>`,
+                morphology: `<div class="teaching-box"><h3>🔬 The -OR Suffix</h3><p>-OR creates agent nouns (people who do things)</p></div>`,
+                puzzles: `<div class="teaching-box"><h3>🧩 Match Verb to Agent</h3><p>Match verbs with their -or agents!</p></div>`
+            },
+            
+            '1-5': {
+                title: 'a as /or/ - A after W',
+                quickGames: `<div class="teaching-box"><h3>📖 Quick Lesson: A after W = /or/</h3><p>When "a" comes after "w" or "qu", it often sounds like /or/!</p><div class="fact-highlight">🎯 Examples: water, war, warm, quarter, quarrel</div></div><div class="game-container"><h4>W and QU Patterns!</h4><div class="word-tiles" id="game15"></div></div>`,
+                etymology: `<div class="teaching-box"><h3>🏛️ Why W Changes A</h3><p>In Old English, the /w/ sound affected nearby vowels, making "a" sound like /or/!</p></div>`,
+                morphology: `<div class="teaching-box"><h3>🔬 War Word Family</h3><p>war → warfare, warrior, warlike, postwar</p></div>`,
+                puzzles: `<div class="teaching-box"><h3>🧩 Build WAR words</h3><p>Create compound words with war!</p></div>`
+            },
+            
+            '1-6': {
+                title: 'ar as /or/ - AR Pattern',
+                quickGames: `<div class="teaching-box"><h3>📖 Quick Lesson: AR as /or/</h3><p>After "w", the letters "ar" also sound like /or/!</p><div class="fact-highlight">🎯 Examples: war, warm, ward, toward, reward</div></div><div class="game-container"><h4>AR Hunt!</h4><div class="word-tiles" id="game16"></div></div>`,
+                etymology: `<div class="teaching-box"><h3>🏛️ Old English Roots</h3><p>These words trace back to Old English "weard" meaning guard or protection</p></div>`,
+                morphology: `<div class="teaching-box"><h3>🔬 WARD Word Family</h3><p>ward → backward, forward, toward, reward, warden</p></div>`,
+                puzzles: `<div class="teaching-box"><h3>🧩 Direction Words</h3><p>Make words with -ward!</p></div>`
+            },
+            
+            '1-7': {
+                title: 'Multisyllabic Words',
+                quickGames: `<div class="teaching-box"><h3>📖 Quick Lesson: Breaking Big Words</h3><p>Multisyllabic words can be broken into syllables AND morphemes!</p><div class="fact-highlight">🎯 remember = re + mem + ber (3 morphemes, 3 syllables)</div></div><div class="game-container"><h4>Syllable Counter!</h4><div class="word-tiles" id="game17"></div></div>`,
+                etymology: `<div class="teaching-box"><h3>🏛️ Building Vocabulary</h3><p>Longer words often combine Latin or Greek roots with multiple affixes</p></div>`,
+                morphology: `<div class="teaching-box"><h3>🔬 Complex Words</h3><p>celebration = celebrate + -ion<br>understanding = under + stand + -ing</p></div>`,
+                puzzles: `<div class="teaching-box"><h3>🧩 Break It Down</h3><p>Separate syllables AND morphemes!</p></div>`
+            },
+            
+            '1-9': {
+                title: 'Multiple /ai/ Spellings',
+                quickGames: `<div class="teaching-box"><h3>📖 Quick Lesson: Many Ways to Spell /ai/</h3><p>The /ai/ sound can be spelled: ey, ea, eigh, aigh!</p><div class="fact-highlight">🎯 they, great, eight, straight</div></div><div class="game-container"><h4>Sort by Spelling!</h4><div class="word-tiles" id="game19"></div></div>`,
+                etymology: `<div class="teaching-box"><h3>🏛️ Historical Spellings</h3><p>These irregular spellings come from different language origins - Old English, French, and Latin!</p></div>`,
+                morphology: `<div class="teaching-box"><h3>🔬 Irregular Patterns</h3><p>These words must be memorized - they don't follow normal rules!</p></div>`,
+                puzzles: `<div class="teaching-box"><h3>🧩 Spelling Challenge</h3><p>Match words to their spelling pattern!</p></div>`
+            },
+            
+            // GROUP 2 - Remaining weeks
+            '2-3': {
+                title: 'Prefix con- (with/together)',
+                quickGames: `
+                    <div class="teaching-box">
+                        <h3>📖 Quick Lesson: CON- means "with"</h3>
+                        <p>The prefix con- means "with" or "together" and comes from Latin!</p>
+                        <div class="fact-highlight">
+                            🎯 connect = con (with) + nect (join) = join together
+                        </div>
+                        <p>Watch out! CON- changes form: com-, col-, cor-</p>
+                    </div>
+                    <div class="game-container">
+                        <h4>⚡ CON- Prefix Hunt!</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Race to find all the CON- words (including com-, col-, cor-)!</p>
+                        <div style="background: rgba(155, 81, 224, 0.1); padding: 1.5rem; border-radius: 15px; text-align: center; margin-bottom: 1rem;">
+                            <div style="font-size: 2rem; font-weight: 700; color: var(--purple);" id="timer23">⏱️ 0.0s</div>
+                            <div style="font-size: 1.2rem; font-weight: 600; margin-top: 0.5rem; color: var(--success);" id="counter23">Found: 0/8</div>
+                        </div>
+                        <div class="word-tiles" id="game23"></div>
+                        <div class="score-display" id="score23" style="display: none;"></div>
+                    </div>
+                `,
+                etymology: `
+                    <div class="teaching-box">
+                        <h3>🏛️ Latin "Cum" (with)</h3>
+                        <p>CON- comes from Latin "cum" meaning "with". The spelling changes based on the letter that follows!</p>
+                        <div class="fact-highlight">
+                            🌟 Latin Rule: The prefix changes to match the sound of the next letter for easier pronunciation
+                        </div>
+                        <p><strong>The variations:</strong></p>
+                        <ul style="margin-left: 2rem; line-height: 2;">
+                            <li><strong>con-</strong> before most letters (connect, contain)</li>
+                            <li><strong>com-</strong> before b, m, p (combine, command, compress)</li>
+                            <li><strong>col-</strong> before l (collect, collide)</li>
+                            <li><strong>cor-</strong> before r (correct, correlate)</li>
+                        </ul>
+                    </div>
+                    <div class="game-container">
+                        <h4>🎓 Variation Quiz!</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Which form does each word use?</p>
+                        <div id="etymQuiz23"></div>
+                    </div>
+                `,
+                morphology: `
+                    <div class="teaching-box">
+                        <h3>🔬 Breaking Down CON- Words</h3>
+                        <p>Every CON- word has a root that tells you what action is being done "together"!</p>
+                        <div class="fact-highlight">
+                            💡 Formula: con- (with/together) + root = action done together
+                        </div>
+                        <p><strong>Common CON- roots:</strong></p>
+                        <ul style="margin-left: 2rem; line-height: 2;">
+                            <li><strong>connect:</strong> con + nect (join) = join together</li>
+                            <li><strong>construct:</strong> con + struct (build) = build together</li>
+                            <li><strong>contract:</strong> con + tract (draw) = draw together</li>
+                            <li><strong>conclude:</strong> con + clude (close) = close together</li>
+                        </ul>
+                    </div>
+                    <div class="game-container">
+                        <h4>🎨 Word Breakdown Lab!</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Click to see morpheme breakdowns with meanings!</p>
+                        <div class="word-tiles" id="morphBuilder23"></div>
+                        <div class="morpheme-breakdown" id="breakdown23"></div>
+                        <div class="definition-reveal" id="definition23"></div>
+                    </div>
+                `,
+                puzzles: `
+                    <div class="teaching-box">
+                        <h3>🧩 CON- Variation Sorter</h3>
+                        <p>Sort words by which variation of CON- they use!</p>
+                        <div class="fact-highlight">
+                            💡 Remember: com- before b/m/p, col- before l, cor- before r
+                        </div>
+                    </div>
+                    <div class="game-container">
+                        <h4>🎯 Sort by Variation!</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Which variation does each word use?</p>
+                        <div id="puzzle23"></div>
+                    </div>
+                `
+            },
+            
+            '2-4': {
+                title: 'Suffix -ar (relating to)',
+                quickGames: `<div class="teaching-box"><h3>📖 Quick Lesson: -AR Adjectives</h3><p>The suffix -ar creates adjectives meaning "relating to"!</p><div class="fact-highlight">🎯 popular, circular, regular</div></div><div class="game-container"><h4>-AR Hunt!</h4><div class="word-tiles" id="game24"></div></div>`,
+                etymology: `<div class="teaching-box"><h3>🏛️ Latin Adjectives</h3><p>-AR comes from Latin adjective endings -aris</p></div>`,
+                morphology: `<div class="teaching-box"><h3>🔬 Noun to Adjective</h3><p>pole → polar<br>circle → circular<br>angle → angular</p></div>`,
+                puzzles: `<div class="teaching-box"><h3>🧩 Transform!</h3><p>Change nouns to -ar adjectives!</p></div>`
+            },
+            
+            '2-5': {
+                title: 'Suffix -er (one who)',
+                quickGames: `<div class="teaching-box"><h3>📖 Quick Lesson: -ER Agent Nouns</h3><p>-ER means "one who does" something!</p><div class="fact-highlight">🎯 teacher, farmer, baker, runner</div></div><div class="game-container"><h4>Job Matching!</h4><div class="word-tiles" id="game25"></div></div>`,
+                etymology: `<div class="teaching-box"><h3>🏛️ Old English Origins</h3><p>-ER is one of the oldest English suffixes, used for over 1000 years!</p></div>`,
+                morphology: `<div class="teaching-box"><h3>🔬 Verb to Person</h3><p>teach → teacher<br>bake → baker<br>run → runner (double consonant!)</p></div>`,
+                puzzles: `<div class="teaching-box"><h3>🧩 Spelling Rules</h3><p>When do you double the consonant before -er?</p></div>`
+            },
+            
+            '2-6': {
+                title: 'Suffix -or (Latin agent)',
+                quickGames: `<div class="teaching-box"><h3>📖 Quick Lesson: -OR vs -ER</h3><p>Both mean "one who" but -OR comes from Latin!</p><div class="fact-highlight">🎯 actor, doctor, senator</div></div><div class="game-container"><h4>-OR or -ER?</h4><div class="word-tiles" id="game26"></div></div>`,
+                etymology: `<div class="teaching-box"><h3>🏛️ Latin Professional Terms</h3><p>-OR is used for Latin-derived professional roles</p></div>`,
+                morphology: `<div class="teaching-box"><h3>🔬 -ATE verbs → -OR nouns</h3><p>educate → educator<br>operate → operator</p></div>`,
+                puzzles: `<div class="teaching-box"><h3>🧩 Which Suffix?</h3><p>Choose -or or -er for each word!</p></div>`
+            },
+            
+            '2-7': {
+                title: 'Suffix -less (without)',
+                quickGames: `<div class="teaching-box"><h3>📖 Quick Lesson: -LESS = "without"</h3><p>The suffix -less means "without" or "lacking"!</p><div class="fact-highlight">🎯 hopeless = without hope, endless = without end</div></div><div class="game-container"><h4>Opposites!</h4><div class="word-tiles" id="game27"></div></div>`,
+                etymology: `<div class="teaching-box"><h3>🏛️ Old English "Leas"</h3><p>-LESS comes from Old English "leas" meaning "devoid of"</p></div>`,
+                morphology: `<div class="teaching-box"><h3>🔬 -LESS vs -FUL</h3><p>Many -less words have -ful opposites:<br>hopeless ↔ hopeful<br>careless ↔ careful</p></div>`,
+                puzzles: `<div class="teaching-box"><h3>🧩 Pair Them Up!</h3><p>Match -less words with their -ful opposites!</p></div>`
+            },
+            
+            '2-9': {
+                title: 'Suffix -ist (specialist)',
+                quickGames: `<div class="teaching-box"><h3>📖 Quick Lesson: -IST = "specialist"</h3><p>-IST means someone who practices or specializes in something!</p><div class="fact-highlight">🎯 artist, scientist, pianist</div></div><div class="game-container"><h4>Find the Specialist!</h4><div class="word-tiles" id="game29"></div></div>`,
+                etymology: `<div class="teaching-box"><h3>🏛️ Greek & Latin Specialist Terms</h3><p>-IST often pairs with -ISM (the practice or belief)</p></div>`,
+                morphology: `<div class="teaching-box"><h3>🔬 Field → Specialist</h3><p>art → artist<br>science → scientist<br>piano → pianist</p></div>`,
+                puzzles: `<div class="teaching-box"><h3>🧩 -IST and -ISM</h3><p>Match specialists with their fields!</p></div>`
+            },
+            
+            // GROUP 3 - Remaining weeks
+            '3-2': {
+                title: 'ti/ci as /sh/ Sound',
+                quickGames: `
+                    <div class="teaching-box">
+                        <h3>📖 Quick Lesson: TI and CI = /sh/</h3>
+                        <p>When TI or CI comes before a vowel, it often makes the /sh/ sound!</p>
+                        <div class="fact-highlight">
+                            🎯 nation, special, partial, delicious
+                        </div>
+                        <p>This happens in suffixes like: -tion, -cial, -tious, -cious</p>
+                    </div>
+                    <div class="game-container">
+                        <h4>⚡ /sh/ Sound Hunt!</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Find all the words with TI or CI making the /sh/ sound!</p>
+                        <div style="background: rgba(155, 81, 224, 0.1); padding: 1.5rem; border-radius: 15px; text-align: center; margin-bottom: 1rem;">
+                            <div style="font-size: 2rem; font-weight: 700; color: var(--purple);" id="timer32">⏱️ 0.0s</div>
+                            <div style="font-size: 1.2rem; font-weight: 600; margin-top: 0.5rem; color: var(--success);" id="counter32">Found: 0/8</div>
+                        </div>
+                        <div class="word-tiles" id="game32"></div>
+                        <div class="score-display" id="score32" style="display: none;"></div>
+                    </div>
+                `,
+                etymology: `
+                    <div class="teaching-box">
+                        <h3>🏛️ Latin Sound Change</h3>
+                        <p>When Latin words entered English through French, the TI and CI sounds before vowels changed to /sh/!</p>
+                        <div class="fact-highlight">
+                            🌟 Historical Fact: This sound change happened during the Norman French influence on English (after 1066)
+                        </div>
+                        <p><strong>Latin to English journey:</strong></p>
+                        <ul style="margin-left: 2rem; line-height: 2;">
+                            <li><strong>nation:</strong> Latin "natio" → French "nation" → English /nay-shun/</li>
+                            <li><strong>special:</strong> Latin "specialis" → /spesh-ul/</li>
+                            <li><strong>attention:</strong> Latin "attentio" → /uh-ten-shun/</li>
+                        </ul>
+                    </div>
+                    <div class="game-container">
+                        <h4>🎓 Suffix Quiz!</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Match words to their suffix patterns:</p>
+                        <div id="etymQuiz32"></div>
+                    </div>
+                `,
+                morphology: `
+                    <div class="teaching-box">
+                        <h3>🔬 Breaking Down TI/CI Words</h3>
+                        <p>Most of these words can be broken into morphemes - the TI/CI is usually part of a suffix!</p>
+                        <div class="fact-highlight">
+                            💡 Common patterns:<br>
+                            • -tion = act/state of<br>
+                            • -cial = relating to<br>
+                            • -tious/-cious = full of
+                        </div>
+                        <p><strong>Morpheme breakdown:</strong></p>
+                        <ul style="margin-left: 2rem; line-height: 2;">
+                            <li><strong>attention:</strong> at- (to) + tent (stretch) + -ion = act of stretching toward</li>
+                            <li><strong>station:</strong> stat (stand) + -ion = place to stand</li>
+                            <li><strong>delicious:</strong> delici (delight) + -ous = full of delight</li>
+                        </ul>
+                    </div>
+                    <div class="game-container">
+                        <h4>🎨 Morpheme Master!</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Click to see full morpheme breakdowns!</p>
+                        <div class="word-tiles" id="morphBuilder32"></div>
+                        <div class="morpheme-breakdown" id="breakdown32"></div>
+                        <div class="definition-reveal" id="definition32"></div>
+                    </div>
+                `,
+                puzzles: `
+                    <div class="teaching-box">
+                        <h3>🧩 Suffix Sorting Challenge</h3>
+                        <p>Sort words by their suffix: -tion, -cial, -tious, or -cious?</p>
+                        <div class="fact-highlight">
+                            💡 All use TI or CI to make the /sh/ sound!
+                        </div>
+                    </div>
+                    <div class="game-container">
+                        <h4>🎯 Sort by Suffix!</h4>
+                        <p style="text-align: center; margin-bottom: 1rem;">Which suffix pattern does each word use?</p>
+                        <div id="puzzle32"></div>
+                    </div>
+                `,
+                challenge: `
+                    <div class="teaching-box">
+                        <h3>⭐ CHALLENGE: TI/CI Master</h3>
+                        <p>Can you explain WHY ratio sounds different from nation, even though both have "ti"?</p>
+                        <div class="fact-highlight">
+                            🏆 Expert Hint: Look at what letter comes AFTER the TI!
+                        </div>
+                        <p style="margin-top: 1.5rem;"><strong>Challenge Tasks:</strong></p>
+                        <ul style="margin-left: 2rem; line-height: 2;">
+                            <li>Find 5 words where TI makes /sh/ and 5 where it doesn't</li>
+                            <li>Break down: station, partial, suspicious, delicious into all morphemes</li>
+                            <li>Explain the pronunciation rule for when TI/CI makes /sh/</li>
+                        </ul>
+                    </div>
+                `
+            },
+            
+            '3-4': {
+                title: 'Suffix -ious (full of)',
+                quickGames: `<div class="teaching-box"><h3>📖 Quick Lesson: -IOUS Adjectives</h3><p>-IOUS means "full of" or "having the quality of"!</p><div class="fact-highlight">🎯 curious, glorious, mysterious</div></div><div class="game-container"><h4>-IOUS Speed Match!</h4><div class="word-tiles" id="game34"></div></div>`,
+                etymology: `<div class="teaching-box"><h3>🏛️ Latin -iosus</h3><p>Comes from Latin adjective ending -iosus</p></div>`,
+                morphology: `<div class="teaching-box"><h3>🔬 Noun → Adjective</h3><p>glory → glorious<br>space → spacious</p></div>`,
+                puzzles: `<div class="teaching-box"><h3>🧩 Spelling Challenge</h3><p>When is it -ious vs -eous?</p></div>`,
+                challenge: `<div class="teaching-box"><h3>⭐ CHALLENGE: -IOUS Mastery</h3><p>Build complete word families from -ious adjectives!</p></div>`
+            },
+            
+            '3-5': {
+                title: 'Suffix -ent (agent/quality)',
+                quickGames: `<div class="teaching-box"><h3>📖 Quick Lesson: -ENT Words</h3><p>-ENT can be an adjective OR a noun (person)!</p><div class="fact-highlight">🎯 student, different, present</div></div><div class="game-container"><h4>-ENT Hunt!</h4><div class="word-tiles" id="game35"></div></div>`,
+                etymology: `<div class="teaching-box"><h3>🏛️ Latin -entem</h3><p>From Latin present participle ending</p></div>`,
+                morphology: `<div class="teaching-box"><h3>🔬 -ENT vs -ANT</h3><p>Both work the same way but from different Latin verbs!</p></div>`,
+                puzzles: `<div class="teaching-box"><h3>🧩 Which One?</h3><p>Choose -ent or -ant!</p></div>`,
+                challenge: `<div class="teaching-box"><h3>⭐ CHALLENGE: Latin Roots</h3><p>Trace -ent words back to their Latin origins!</p></div>`
+            },
+            
+            '3-6': {
+                title: 'Suffix -ment (state/result)',
+                quickGames: `<div class="teaching-box"><h3>📖 Quick Lesson: -MENT Makes Nouns</h3><p>-MENT turns verbs into nouns meaning "result of" or "state of"!</p><div class="fact-highlight">🎯 excite → excitement, develop → development</div></div><div class="game-container"><h4>Verb to Noun!</h4><div class="word-tiles" id="game36"></div></div>`,
+                etymology: `<div class="teaching-box"><h3>🏛️ French -ment</h3><p>Came to English from French after 1066!</p></div>`,
+                morphology: `<div class="teaching-box"><h3>🔬 Spelling Changes</h3><p>argue → argument (drop e)<br>judge → judgment (drop e)<br>excite → excitement (keep e)</p></div>`,
+                puzzles: `<div class="teaching-box"><h3>🧩 Drop the E?</h3><p>When do you drop the e before -ment?</p></div>`,
+                challenge: `<div class="teaching-box"><h3>⭐ CHALLENGE: -MENT Spelling Rules</h3><p>Master the spelling rules for -ment!</p></div>`
+            },
+            
+            '3-7': {
+                title: 'Suffix -ian (person/from)',
+                quickGames: `<div class="teaching-box"><h3>📖 Quick Lesson: -IAN People & Places</h3><p>-IAN means "person who" OR "from a place"!</p><div class="fact-highlight">🎯 musician, Australian, magician</div></div><div class="game-container"><h4>-IAN Matching!</h4><div class="word-tiles" id="game37"></div></div>`,
+                etymology: `<div class="teaching-box"><h3>🏛️ Latin -ianus</h3><p>Used for professions AND nationalities!</p></div>`,
+                morphology: `<div class="teaching-box"><h3>🔬 Two Meanings</h3><p>Profession: music → musician<br>Place: Italy → Italian</p></div>`,
+                puzzles: `<div class="teaching-box"><h3>🧩 Profession or Place?</h3><p>Sort -ian words by meaning!</p></div>`,
+                challenge: `<div class="teaching-box"><h3>⭐ CHALLENGE: -IAN Word Families</h3><p>Build complete families from -ian words!</p></div>`
+            },
+            
+            '3-9': {
+                title: 'Suffix -ory (place/relating to)',
+                quickGames: `<div class="teaching-box"><h3>📖 Quick Lesson: -ORY Two Meanings</h3><p>-ORY means "place where" OR "relating to"!</p><div class="fact-highlight">🎯 laboratory (place), sensory (relating to)</div></div><div class="game-container"><h4>-ORY Challenge!</h4><div class="word-tiles" id="game39"></div></div>`,
+                etymology: `<div class="teaching-box"><h3>🏛️ Latin -orium</h3><p>From Latin for both places AND qualities!</p></div>`,
+                morphology: `<div class="teaching-box"><h3>🔬 Place vs Quality</h3><p>Place: laboratory, dormitory<br>Quality: sensory, compulsory</p></div>`,
+                puzzles: `<div class="teaching-box"><h3>🧩 Which Meaning?</h3><p>Is it a place or a quality?</p></div>`,
+                challenge: `<div class="teaching-box"><h3>⭐ CHALLENGE: -ORY Mastery</h3><p>Analyze -ory words and their Latin roots!</p></div>`
+            }
+        };
+
+        let currentActivityKey = '';
+
+        // Game initialization functions
+        function initQuickGames() {
+            if (currentActivityKey === '1-2') {
+                // Drag and drop sorting game
+                const words = ['make', 'cat', 'gate', 'hat', 'take', 'late', 'safe', 'bat', 'create', 'tape'];
+                const yesWords = ['make', 'gate', 'take', 'late', 'safe', 'create', 'tape'];
+                initDragSortGame('wordBank1', 'yesWords1', 'noWords1', words, yesWords);
+                
+            } else if (currentActivityKey === '2-2') {
+                // Timed clicking game
+                const allWords = ['microscope', 'telephone', 'microwave', 'macrobiotic', 'microchip', 'microphone', 'telegram', 'microorganism', 'television', 'microfilm'];
+                const correctWords = ['microscope', 'microwave', 'microchip', 'microphone', 'microorganism', 'microfilm'];
+                initTimedClickGame('microSort', 'microScore', 'microTimer', 'microCounter', allWords, correctWords);
+                
+            } else if (currentActivityKey === '3-3') {
+                // Rapid fire yes/no game
+                const words = [
+                    {word: 'create', isVerb: true},
+                    {word: 'chocolate', isVerb: false},
+                    {word: 'operate', isVerb: true},
+                    {word: 'private', isVerb: false},
+                    {word: 'celebrate', isVerb: true},
+                    {word: 'educate', isVerb: true},
+                    {word: 'pirate', isVerb: false},
+                    {word: 'activate', isVerb: true},
+                    {word: 'climate', isVerb: false}
+                ];
+                initRapidFireGame('ateGameArea', words);
+                
+            } else if (currentActivityKey === '1-3') {
+                const words = ['key', 'honey', 'monkey', 'they', 'grey', 'valley', 'money', 'turkey', 'alley', 'jockey'];
+                const yesWords = ['key', 'honey', 'monkey', 'they', 'grey', 'valley', 'money', 'turkey', 'alley', 'jockey'];
+                initDragSortGame('wordBank13', 'yesWords13', 'noWords13', words, yesWords);
+                
+            } else if (currentActivityKey === '1-4') {
+                const allWords = ['actor', 'doctor', 'editor', 'factor', 'motor', 'sector', 'tutor', 'vector'];
+                initSimpleClickGame('game14', allWords);
+                
+            } else if (currentActivityKey === '1-5') {
+                const allWords = ['water', 'war', 'warm', 'ward', 'warn', 'quarter', 'quarrel', 'quality', 'watch', 'want'];
+                const correctWords = ['war', 'warm', 'ward', 'warn', 'quarter', 'quarrel'];
+                initSimpleClickGame('game15', allWords, correctWords);
+                
+            } else if (currentActivityKey === '1-6') {
+                const allWords = ['war', 'warm', 'ward', 'toward', 'reward', 'forward', 'backward', 'warden'];
+                initSimpleClickGame('game16', allWords);
+                
+            } else if (currentActivityKey === '1-7') {
+                const allWords = ['remember', 'understand', 'celebration', 'education', 'important', 'different', 'wonderful', 'beautiful'];
+                initSimpleClickGame('game17', allWords);
+                
+            } else if (currentActivityKey === '1-9') {
+                const allWords = ['they', 'grey', 'obey', 'great', 'break', 'steak', 'eight', 'weigh', 'neighbor', 'straight'];
+                initSimpleClickGame('game19', allWords);
+                
+            } else if (currentActivityKey === '2-3') {
+                const allWords = ['connect', 'contain', 'contract', 'construct', 'combine', 'collect', 'correct', 'conclude'];
+                const correctWords = ['connect', 'contain', 'contract', 'construct', 'combine', 'collect', 'correct', 'conclude'];
+                initTimedClickGame('game23', 'score23', 'timer23', 'counter23', allWords, correctWords);
+                
+            } else if (currentActivityKey === '2-4') {
+                const allWords = ['popular', 'regular', 'circular', 'similar', 'familiar', 'polar', 'angular', 'particular'];
+                initSimpleClickGame('game24', allWords);
+                
+            } else if (currentActivityKey === '2-5') {
+                const allWords = ['teacher', 'farmer', 'baker', 'runner', 'writer', 'singer', 'dancer', 'player'];
+                initSimpleClickGame('game25', allWords);
+                
+            } else if (currentActivityKey === '2-6') {
+                const allWords = ['actor', 'doctor', 'director', 'instructor', 'editor', 'senator', 'governor', 'inventor'];
+                initSimpleClickGame('game26', allWords);
+                
+            } else if (currentActivityKey === '2-7') {
+                const allWords = ['hopeless', 'careless', 'fearless', 'helpless', 'endless', 'useless', 'harmless', 'worthless'];
+                initSimpleClickGame('game27', allWords);
+                
+            } else if (currentActivityKey === '2-9') {
+                const allWords = ['artist', 'scientist', 'dentist', 'pianist', 'journalist', 'specialist', 'tourist', 'optimist'];
+                initSimpleClickGame('game29', allWords);
+                
+            } else if (currentActivityKey === '3-2') {
+                const allWords = ['nation', 'station', 'action', 'special', 'partial', 'delicious', 'precious', 'suspicious'];
+                const correctWords = ['nation', 'station', 'action', 'special', 'partial', 'delicious', 'precious', 'suspicious'];
+                initTimedClickGame('game32', 'score32', 'timer32', 'counter32', allWords, correctWords);
+                
+            } else if (currentActivityKey === '3-4') {
+                const allWords = ['curious', 'glorious', 'furious', 'mysterious', 'precious', 'delicious', 'spacious', 'cautious'];
+                initSimpleClickGame('game34', allWords);
+                
+            } else if (currentActivityKey === '3-5') {
+                const allWords = ['student', 'different', 'present', 'absent', 'intelligent', 'confident', 'patient', 'resident'];
+                initSimpleClickGame('game35', allWords);
+                
+            } else if (currentActivityKey === '3-6') {
+                const allWords = ['excitement', 'development', 'agreement', 'government', 'improvement', 'enjoyment', 'treatment', 'statement'];
+                initSimpleClickGame('game36', allWords);
+                
+            } else if (currentActivityKey === '3-7') {
+                const allWords = ['musician', 'magician', 'electrician', 'technician', 'Australian', 'Italian', 'Canadian', 'librarian'];
+                initSimpleClickGame('game37', allWords);
+                
+            } else if (currentActivityKey === '3-9') {
+                const allWords = ['laboratory', 'factory', 'observatory', 'dormitory', 'sensory', 'compulsory', 'memory', 'history'];
+                initSimpleClickGame('game39', allWords);
+            }
+        }
+
+        function initDragSortGame(bankId, yesId, noId, allWords, correctWords) {
+            const bank = document.getElementById(bankId);
+            const yesContainer = document.getElementById(yesId);
+            const noContainer = document.getElementById(noId);
+            
+            if (!bank) return;
+            
+            bank.innerHTML = '';
+            let selectedTile = null;
+            let stage = 'selecting'; // 'selecting' or 'placing'
+            
+            // Create word tiles that work with clicks/taps
+            allWords.forEach(word => {
+                const tile = document.createElement('div');
+                tile.className = 'word-tile';
+                tile.textContent = word;
+                tile.id = `word-${word}`;
+                tile.dataset.word = word;
+                tile.style.cursor = 'pointer';
+                tile.style.touchAction = 'manipulation';
+                
+                // Handle both click and touch
+                const handleSelect = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    if (this.parentElement.id !== bankId) return; // Already placed
+                    
+                    // Deselect previous
+                    bank.querySelectorAll('.word-tile').forEach(t => {
+                        t.style.border = 'none';
+                        t.style.transform = 'none';
+                    });
+                    
+                    // Select this one with visual feedback
+                    this.style.border = '5px solid var(--purple)';
+                    this.style.transform = 'scale(1.1)';
+                    this.style.background = 'linear-gradient(135deg, var(--purple), #9B51E0)';
+                    this.style.color = 'white';
+                    selectedTile = this;
+                    
+                    // Show instruction
+                    const msg = document.createElement('div');
+                    msg.id = 'sortMsg';
+                    msg.style.cssText = 'text-align: center; font-weight: 700; color: var(--purple); margin: 1rem 0; animation: pulse 1s infinite; font-size: 1.2rem; background: rgba(155, 81, 224, 0.1); padding: 1rem; border-radius: 10px;';
+                    msg.textContent = '👆 Now tap the YES or NO box above!';
+                    
+                    const existing = document.getElementById('sortMsg');
+                    if (existing) existing.remove();
+                    bank.parentElement.insertBefore(msg, bank);
+                };
+                
+                tile.addEventListener('click', handleSelect);
+                tile.addEventListener('touchend', handleSelect);
+                
+                bank.appendChild(tile);
+            });
+            
+            // Make YES box clickable
+            const yesBox = document.getElementById('yesBox${bankId.slice(-2)}');
+            const noBox = document.getElementById('noBox${bankId.slice(-2)}');
+            
+            yesBox.style.cursor = 'pointer';
+            noBox.style.cursor = 'pointer';
+            yesBox.style.touchAction = 'manipulation';
+            noBox.style.touchAction = 'manipulation';
+            
+            const handleYesClick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (selectedTile) {
+                    // Flash feedback
+                    yesBox.style.background = 'rgba(6, 167, 125, 0.5)';
+                    setTimeout(() => {
+                        yesBox.style.background = 'rgba(6, 167, 125, 0.2)';
+                    }, 200);
+                    placeTile(selectedTile, yesContainer, 'yes');
+                }
+            };
+            
+            const handleNoClick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (selectedTile) {
+                    // Flash feedback
+                    noBox.style.background = 'rgba(255, 107, 53, 0.5)';
+                    setTimeout(() => {
+                        noBox.style.background = 'rgba(255, 107, 53, 0.2)';
+                    }, 200);
+                    placeTile(selectedTile, noContainer, 'no');
+                }
+            };
+            
+            yesBox.addEventListener('click', handleYesClick);
+            yesBox.addEventListener('touchend', handleYesClick);
+            
+            noBox.addEventListener('click', handleNoClick);
+            noBox.addEventListener('touchend', handleNoClick);
+            
+            function placeTile(tile, container, category) {
+                tile.style.border = 'none';
+                tile.remove();
+                tile.style.cursor = 'default';
+                container.appendChild(tile);
+                
+                const msg = document.getElementById('sortMsg');
+                if (msg) msg.remove();
+                
+                selectedTile = null;
+                
+                // Check if all done
+                if (bank.children.length === 0) {
+                    setTimeout(() => {
+                        const btn = document.querySelector(`button[onclick="checkSorting${bankId.slice(-2)}()"]`);
+                        if (btn) {
+                            btn.style.background = 'var(--success)';
+                            btn.textContent = '✓ All Sorted! Click to Check!';
+                            btn.style.animation = 'pulse 1s infinite';
+                        }
+                    }, 300);
+                }
+            }
+            
+            window[`checkSorting${bankId.slice(-2)}`] = function() {
+                let correct = 0;
+                let total = allWords.length;
+                
+                // Check yes box
+                const yesBoxWords = Array.from(yesContainer.children).map(el => el.dataset.word);
+                yesBoxWords.forEach(word => {
+                    const tile = document.getElementById(`word-${word}`);
+                    if (correctWords.includes(word)) {
+                        tile.style.background = 'linear-gradient(135deg, var(--success), #38B583)';
+                        tile.style.color = 'white';
+                        correct++;
+                    } else {
+                        tile.style.background = 'linear-gradient(135deg, #E74C3C, #C0392B)';
+                        tile.style.color = 'white';
+                    }
+                });
+                
+                // Check no box
+                const noBoxWords = Array.from(noContainer.children).map(el => el.dataset.word);
+                noBoxWords.forEach(word => {
+                    const tile = document.getElementById(`word-${word}`);
+                    if (!correctWords.includes(word)) {
+                        tile.style.background = 'linear-gradient(135deg, var(--success), #38B583)';
+                        tile.style.color = 'white';
+                        correct++;
+                    } else {
+                        tile.style.background = 'linear-gradient(135deg, #E74C3C, #C0392B)';
+                        tile.style.color = 'white';
+                    }
+                });
+                
+                const scoreDisplay = document.getElementById(`sortScore${bankId.slice(-2)}`);
+                if (scoreDisplay) {
+                    scoreDisplay.textContent = `🎉 You got ${correct} out of ${total} correct!`;
+                    scoreDisplay.style.display = 'block';
+                }
+            };
+            
+            // Keep drag support for desktop
+            window.allowDrop = function(event) {
+                event.preventDefault();
+            };
+            
+            window.drop = function(event, category) {
+                event.preventDefault();
+                const word = event.dataTransfer.getData('text');
+                const tile = document.getElementById(`word-${word}`);
+                
+                if (tile && tile.parentElement.id.includes('wordBank')) {
+                    tile.remove();
+                    tile.style.cursor = 'default';
+                    
+                    if (category === 'yes') {
+                        yesContainer.appendChild(tile);
+                    } else {
+                        noContainer.appendChild(tile);
+                    }
+                }
+            };
+        }
+
+        function initTimedClickGame(containerId, scoreId, timerId, counterId, allWords, correctWords) {
+            const container = document.getElementById(containerId);
+            const scoreDisplay = document.getElementById(scoreId);
+            const timerDisplay = document.getElementById(timerId);
+            const counterDisplay = document.getElementById(counterId);
+            
+            if (!container) return;
+            
+            let found = 0;
+            let startTime = null;
+            let timerInterval = null;
+            
+            container.innerHTML = '';
+            
+            allWords.forEach(word => {
+                const tile = document.createElement('div');
+                tile.className = 'word-tile';
+                tile.textContent = word;
+                
+                tile.onclick = function() {
+                    if (this.classList.contains('selected') || this.classList.contains('incorrect')) return;
+                    
+                    if (!startTime) {
+                        startTime = Date.now();
+                        timerInterval = setInterval(() => {
+                            const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+                            timerDisplay.textContent = `⏱️ ${elapsed}s`;
+                        }, 100);
+                    }
+                    
+                    if (correctWords.includes(word)) {
+                        this.classList.add('selected');
+                        found++;
+                        counterDisplay.textContent = `Found: ${found}/${correctWords.length}`;
+                        
+                        if (found === correctWords.length) {
+                            clearInterval(timerInterval);
+                            const finalTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                            scoreDisplay.textContent = `🎉 Perfect! You found all ${correctWords.length} micro- words in ${finalTime} seconds!`;
+                            scoreDisplay.style.display = 'block';
+                        }
+                    } else {
+                        this.classList.add('incorrect');
+                    }
+                };
+                
+                container.appendChild(tile);
+            });
+        }
+
+        function initRapidFireGame(containerId, words) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            let currentIdx = 0;
+            let score = 0;
+            let timeLeft = 5;
+            let timerInterval = null;
+            
+            function showWord() {
+                if (currentIdx >= words.length) {
+                    clearInterval(timerInterval);
+                    container.innerHTML = `
+                        <div class="score-display">
+                            🎉 Game Complete!<br>
+                            You got ${score} out of ${words.length} correct!<br>
+                            Accuracy: ${Math.round((score/words.length)*100)}%
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const current = words[currentIdx];
+                timeLeft = 5;
+                
+                container.innerHTML = `
+                    <div style="background: rgba(155, 81, 224, 0.15); padding: 2rem; border-radius: 15px; margin-bottom: 1.5rem;">
+                        <div style="font-size: 2.5rem; font-weight: 700; text-align: center; color: var(--purple); margin-bottom: 1rem;">
+                            ${current.word}
+                        </div>
+                        <div style="text-align: center; font-size: 1.5rem; font-weight: 600; color: var(--primary);" id="rapidTimer">
+                            ⏱️ ${timeLeft}s
+                        </div>
+                        <div style="text-align: center; margin-top: 0.5rem; color: #666;">
+                            Question ${currentIdx + 1} of ${words.length}
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <button class="try-again-btn" onclick="answerRapid(true)" style="margin: 0; font-size: 1.3rem; padding: 1.5rem;">
+                            ✓ YES<br><small style="font-size: 0.8rem;">It's a verb</small>
+                        </button>
+                        <button class="try-again-btn" onclick="answerRapid(false)" style="margin: 0; font-size: 1.3rem; padding: 1.5rem; background: var(--primary);">
+                            ✗ NO<br><small style="font-size: 0.8rem;">Not a verb</small>
+                        </button>
+                    </div>
+                    
+                    <div style="margin-top: 1rem; text-align: center; font-weight: 600; color: var(--success);">
+                        Score: ${score}/${currentIdx}
+                    </div>
+                `;
+                
+                if (timerInterval) clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    const timerEl = document.getElementById('rapidTimer');
+                    if (timerEl) {
+                        timerEl.textContent = `⏱️ ${timeLeft}s`;
+                        if (timeLeft <= 0) {
+                            clearInterval(timerInterval);
+                            currentIdx++;
+                            setTimeout(showWord, 500);
+                        }
+                    }
+                }, 1000);
+            }
+            
+            window.answerRapid = function(answer) {
+                clearInterval(timerInterval);
+                const current = words[currentIdx];
+                
+                if (answer === current.isVerb) {
+                    score++;
+                }
+                
+                currentIdx++;
+                setTimeout(showWord, 300);
+            };
+            
+            showWord();
+        }
+        
+        function initSimpleClickGame(containerId, words, correctWords = null) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            // If no correctWords specified, all are correct
+            const targets = correctWords || words;
+            let found = 0;
+            
+            container.innerHTML = '';
+            words.forEach(word => {
+                const tile = document.createElement('div');
+                tile.className = 'word-tile';
+                tile.textContent = word;
+                tile.style.cursor = 'pointer';
+                
+                tile.onclick = function() {
+                    if (!this.classList.contains('selected')) {
+                        if (targets.includes(word)) {
+                            this.classList.add('selected');
+                            found++;
+                            
+                            if (found === targets.length) {
+                                setTimeout(() => {
+                                    alert(`🎉 Perfect! You found all ${targets.length} words!`);
+                                }, 300);
+                            }
+                        }
+                    }
+                };
+                
+                container.appendChild(tile);
+            });
+        }
+
+        function initMorphology() {
+            if (currentActivityKey === '1-2') {
+                const words = [
+                    { word: 'remake', parts: [{text: 're-', type: 'prefix'}, {text: 'make', type: 'root'}], definition: '"re-" means AGAIN, so remake = to make again' },
+                    { word: 'unsafe', parts: [{text: 'un-', type: 'prefix'}, {text: 'safe', type: 'root'}], definition: '"un-" means NOT, so unsafe = not safe' },
+                    { word: 'maker', parts: [{text: 'make', type: 'root'}, {text: '-er', type: 'suffix'}], definition: '"-er" means ONE WHO, so maker = one who makes' },
+                    { word: 'relation', parts: [{text: 're-', type: 'prefix'}, {text: 'lat', type: 'root'}, {text: '-ion', type: 'suffix'}], definition: '"re-" (back) + "lat" (carry) + "-ion" (act of) = the act of connecting to' }
+                ];
+                initMorphemeBuilder('morphemeBuilder1', 'breakdown1', 'definition1', words);
+            } else if (currentActivityKey === '2-2') {
+                const words = [
+                    { word: 'microscope', parts: [{text: 'micro-', type: 'prefix'}, {text: 'scope', type: 'root'}], definition: '"micro" (small) + "scope" (see) = tool to see tiny things', correct: true },
+                    { word: 'telephone', parts: [{text: 'tele-', type: 'prefix'}, {text: 'phone', type: 'root'}], definition: '"tele" (far/distant) + "phone" (sound) = NOT a micro- word!', correct: false },
+                    { word: 'microphone', parts: [{text: 'micro-', type: 'prefix'}, {text: 'phone', type: 'root'}], definition: '"micro" (small) + "phone" (sound) = device for amplifying small sounds', correct: true },
+                    { word: 'microorganism', parts: [{text: 'micro-', type: 'prefix'}, {text: 'organism', type: 'root'}], definition: '"micro" (small) + "organism" (living thing) = tiny living creature (like bacteria!)', correct: true },
+                    { word: 'macroscope', parts: [{text: 'macro-', type: 'prefix'}, {text: 'scope', type: 'root'}], definition: '"macro" (LARGE) + "scope" = opposite of micro! NOT a micro- word!', correct: false },
+                    { word: 'microchip', parts: [{text: 'micro-', type: 'prefix'}, {text: 'chip', type: 'root'}], definition: '"micro" (small) + "chip" = tiny computer processor', correct: true },
+                    { word: 'microwave', parts: [{text: 'micro-', type: 'prefix'}, {text: 'wave', type: 'root'}], definition: '"micro" (small) + "wave" = very short electromagnetic wave', correct: true }
+                ];
+                initMorphemeBuilder('microMorphemes', 'microBreakdown', 'microDefinition', words);
+            } else if (currentActivityKey === '3-3') {
+                const words = [
+                    { word: 'create', parts: [{text: 'cre', type: 'root'}, {text: '-ate', type: 'suffix'}], definition: 'Latin "creare" (to make) + "-ate" (to do) = to bring into existence' },
+                    { word: 'educate', parts: [{text: 'educ', type: 'root'}, {text: '-ate', type: 'suffix'}], definition: 'Latin "educare" (to lead out) + "-ate" = to teach and develop' },
+                    { word: 'activate', parts: [{text: 'activ', type: 'root'}, {text: '-ate', type: 'suffix'}], definition: 'Latin "activus" (active) + "-ate" = to make active or operative' },
+                    { word: 'investigate', parts: [{text: 'in-', type: 'prefix'}, {text: 'vestig', type: 'root'}, {text: '-ate', type: 'suffix'}], definition: '"in" (into) + "vestig" (track) + "-ate" = to search into systematically' }
+                ];
+                initMorphemeBuilder('ateMorphemes', 'ateBreakdown', 'ateDefinition', words);
+            } else if (currentActivityKey === '1-3') {
+                const words = [
+                    { word: 'keyboard', parts: [{text: 'key', type: 'root'}, {text: 'board', type: 'root'}], definition: 'key + board = board with keys for typing' },
+                    { word: 'keyhole', parts: [{text: 'key', type: 'root'}, {text: 'hole', type: 'root'}], definition: 'key + hole = hole where a key goes' },
+                    { word: 'keystone', parts: [{text: 'key', type: 'root'}, {text: 'stone', type: 'root'}], definition: 'key + stone = central stone that holds an arch together' },
+                    { word: 'hockey', parts: [{text: 'hock', type: 'root'}, {text: '-ey', type: 'suffix'}], definition: 'Sport played with a curved stick (origin unclear!)' }
+                ];
+                initMorphemeBuilder('morphBuilder13', 'breakdown13', 'definition13', words);
+            } else if (currentActivityKey === '2-3') {
+                const words = [
+                    { word: 'connect', parts: [{text: 'con-', type: 'prefix'}, {text: 'nect', type: 'root'}], definition: '"con" (together) + "nect" (join) = join together' },
+                    { word: 'combine', parts: [{text: 'com-', type: 'prefix'}, {text: 'bine', type: 'root'}], definition: '"com" (together) + "bine" (two) = bring two together' },
+                    { word: 'collect', parts: [{text: 'col-', type: 'prefix'}, {text: 'lect', type: 'root'}], definition: '"col" (together) + "lect" (gather) = gather together' },
+                    { word: 'correct', parts: [{text: 'cor-', type: 'prefix'}, {text: 'rect', type: 'root'}], definition: '"cor" (together) + "rect" (right) = make right together' },
+                    { word: 'construct', parts: [{text: 'con-', type: 'prefix'}, {text: 'struct', type: 'root'}], definition: '"con" (together) + "struct" (build) = build together' }
+                ];
+                initMorphemeBuilder('morphBuilder23', 'breakdown23', 'definition23', words);
+            } else if (currentActivityKey === '3-2') {
+                const words = [
+                    { word: 'station', parts: [{text: 'stat', type: 'root'}, {text: '-ion', type: 'suffix'}], definition: '"stat" (stand) + "-ion" (place) = place to stand' },
+                    { word: 'attention', parts: [{text: 'at-', type: 'prefix'}, {text: 'tent', type: 'root'}, {text: '-ion', type: 'suffix'}], definition: '"at" (to) + "tent" (stretch) + "-ion" = act of stretching toward' },
+                    { word: 'special', parts: [{text: 'spec', type: 'root'}, {text: '-ial', type: 'suffix'}], definition: '"spec" (look) + "-ial" (relating to) = relating to a particular look/kind' },
+                    { word: 'delicious', parts: [{text: 'delic', type: 'root'}, {text: '-ious', type: 'suffix'}], definition: '"delic" (delight) + "-ious" (full of) = full of delight' }
+                ];
+                initMorphemeBuilder('morphBuilder32', 'breakdown32', 'definition32', words);
+            }
+        }
+
+
+        function initMorphemeBuilder(builderId, breakdownId, definitionId, wordsData) {
+            const builder = document.getElementById(builderId);
+            const breakdown = document.getElementById(breakdownId);
+            const definition = document.getElementById(definitionId);
+            
+            if (!builder || !breakdown || !definition) return;
+            
+            builder.innerHTML = '';
+            breakdown.innerHTML = '';
+            definition.classList.remove('show');
+            definition.textContent = '';
+            
+            wordsData.forEach(item => {
+                const tile = document.createElement('div');
+                tile.className = 'word-tile';
+                tile.textContent = item.word;
+                
+                // Add visual hint for incorrect words
+                if (item.correct === false) {
+                    tile.style.opacity = '0.9';
+                }
+                
+                tile.onclick = function() {
+                    // Remove previous selections
+                    builder.querySelectorAll('.word-tile').forEach(t => t.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    // Clear previous content
+                    breakdown.innerHTML = '';
+                    definition.classList.remove('show');
+                    
+                    // Show breakdown with animation
+                    item.parts.forEach((part, idx) => {
+                        setTimeout(() => {
+                            const morpheme = document.createElement('div');
+                            morpheme.className = `morpheme-part ${part.type}`;
+                            morpheme.textContent = part.text;
+                            breakdown.appendChild(morpheme);
+                        }, idx * 200);
+                    });
+                    
+                    // Show definition with color coding
+                    setTimeout(() => {
+                        definition.textContent = item.definition;
+                        definition.classList.add('show');
+                        
+                        // Color code based on correctness
+                        if (item.correct === false) {
+                            definition.style.background = 'linear-gradient(135deg, rgba(255, 107, 53, 0.15), rgba(255, 107, 53, 0.25))';
+                            definition.style.borderColor = 'var(--primary)';
+                        } else {
+                            definition.style.background = 'linear-gradient(135deg, rgba(6, 167, 125, 0.15), rgba(6, 167, 125, 0.25))';
+                            definition.style.borderColor = 'var(--success)';
+                        }
+                    }, item.parts.length * 200 + 200);
+                };
+                builder.appendChild(tile);
+            });
+        }
+
+        function showScore(scoreId, score, total) {
+            const scoreDisplay = document.getElementById(scoreId);
+            if (!scoreDisplay) return;
+            
+            scoreDisplay.textContent = `🎉 You got ${score} out of ${total} correct!`;
+            scoreDisplay.style.display = 'block';
+        }
+
+        function initPuzzles() {
+            if (currentActivityKey === '1-2') {
+                // Drag and drop morpheme building game
+                const morphemes = ['re', 'un', 'make', 'safe', 'take', 'er', 'ing'];
+                const morphemeDisplay = ['re-', 'un-', 'make', 'safe', 'take', '-er', '-ing']; // For display only
+                const correctWords = [
+                    {word: 'remake', parts: ['re', 'make']},
+                    {word: 'unsafe', parts: ['un', 'safe']},
+                    {word: 'maker', parts: ['make', 'er']},
+                    {word: 'taking', parts: ['take', 'ing']},
+                    {word: 'retake', parts: ['re', 'take']}
+                ];
+                initDragDropPuzzle('morphemeBank1', 'buildZone1', 'puzzleScore1', morphemes, morphemeDisplay, correctWords);
+                
+            } else if (currentActivityKey === '2-2') {
+                // Matching game
+                const pairs = [
+                    {prefix: 'micro-', root: 'scope', word: 'microscope', meaning: 'tool to see tiny things'},
+                    {prefix: 'micro-', root: 'phone', word: 'microphone', meaning: 'device for small sounds'},
+                    {prefix: 'micro-', root: 'wave', word: 'microwave', meaning: 'small electromagnetic wave'},
+                    {prefix: 'micro-', root: 'chip', word: 'microchip', meaning: 'tiny computer part'}
+                ];
+                initMatchingPuzzle('microPuzzle', pairs);
+                
+            } else if (currentActivityKey === '3-3') {
+                // Word scramble
+                const scrambles = [
+                    {scrambled: 'teaerc', answer: 'create'},
+                    {scrambled: 'teopare', answer: 'operate'},
+                    {scrambled: 'edeucta', answer: 'educate'},
+                    {scrambled: 'eecbrleta', answer: 'celebrate'},
+                    {scrambled: 'tiaaevct', answer: 'activate'}
+                ];
+                initScramblePuzzle('atePuzzle', scrambles);
+            } else if (currentActivityKey === '1-3') {
+                // Matching compound words puzzle
+                const pairs = [
+                    {prefix: 'key', root: 'board', word: 'keyboard'},
+                    {prefix: 'key', root: 'hole', word: 'keyhole'},
+                    {prefix: 'key', root: 'stone', word: 'keystone'},
+                    {prefix: 'key', root: 'pad', word: 'keypad'}
+                ];
+                initMatchingPuzzle('puzzle13', pairs);
+            } else if (currentActivityKey === '2-3') {
+                // CON- variation sorting
+                const pairs = [
+                    {prefix: 'con-', root: 'nect', word: 'connect'},
+                    {prefix: 'com-', root: 'bine', word: 'combine'},
+                    {prefix: 'col-', root: 'lect', word: 'collect'},
+                    {prefix: 'cor-', root: 'rect', word: 'correct'}
+                ];
+                initMatchingPuzzle('puzzle23', pairs);
+            } else if (currentActivityKey === '3-2') {
+                // Suffix sorting for TI/CI words
+                const pairs = [
+                    {prefix: 'nat', root: '-ion', word: 'nation'},
+                    {prefix: 'spec', root: '-ial', word: 'special'},
+                    {prefix: 'delic', root: '-ious', word: 'delicious'},
+                    {prefix: 'stat', root: '-ion', word: 'station'}
+                ];
+                initMatchingPuzzle('puzzle32', pairs);
+            }
+        }
+
+        function initDragDropPuzzle(bankId, zoneId, scoreId, morphemes, morphemeDisplay, correctWords) {
+            const bank = document.getElementById(bankId);
+            const zone = document.getElementById(zoneId);
+            const scoreDisplay = document.getElementById(scoreId);
+            
+            if (!bank || !zone) return;
+            
+            let completedWords = 0;
+            let currentBuild = [];
+            
+            // Create morpheme chips
+            bank.innerHTML = '';
+            morphemes.forEach((m, idx) => {
+                const chip = document.createElement('div');
+                chip.className = 'morpheme-chip';
+                chip.textContent = morphemeDisplay[idx]; // Display with hyphens
+                chip.dataset.morpheme = m; // Store actual value without hyphens
+                chip.style.cursor = 'pointer';
+                chip.style.userSelect = 'none';
+                
+                chip.addEventListener('click', () => {
+                    currentBuild.push(m); // Use value without hyphens
+                    updateBuildZone();
+                });
+                
+                bank.appendChild(chip);
+            });
+            
+            // Create build zone with target words shown
+            zone.innerHTML = `
+                <div style="background: rgba(155, 81, 224, 0.1); padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+                    <p style="font-weight: 600; text-align: center; margin-bottom: 0.5rem;">🎯 Words to Build:</p>
+                    <p style="text-align: center; color: var(--purple); font-weight: 600;">
+                        ${correctWords.map(w => w.word).join(', ')}
+                    </p>
+                </div>
+                
+                <div style="min-height: 100px; border: 3px dashed var(--secondary); border-radius: 15px; padding: 1rem; background: white; margin-bottom: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;" id="currentBuild">
+                    <span style="color: #999;">Click morphemes above to build a word...</span>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <button class="check-button" onclick="checkWord()" style="margin: 0;">✓ Check Word</button>
+                    <button class="try-again-btn" onclick="clearBuild()" style="margin: 0; background: var(--primary);">✗ Clear</button>
+                </div>
+                <div style="margin-top: 1.5rem;" id="wordsCompleted"></div>
+            `;
+            
+            function updateBuildZone() {
+                const buildDiv = document.getElementById('currentBuild');
+                if (!buildDiv) return;
+                
+                if (currentBuild.length === 0) {
+                    buildDiv.innerHTML = '<span style="color: #999;">Click morphemes above to build a word...</span>';
+                } else {
+                    // Display with visual separation but join without hyphens for checking
+                    buildDiv.innerHTML = currentBuild.map((m, idx) => {
+                        const displayIdx = morphemes.indexOf(m);
+                        const displayText = morphemeDisplay[displayIdx];
+                        return `<div class="morpheme-chip" style="cursor: default;">${displayText}</div>`;
+                    }).join('');
+                }
+            }
+            
+            window.checkWord = function() {
+                if (currentBuild.length === 0) {
+                    alert('⚠️ Click some morphemes first to build a word!');
+                    return;
+                }
+                
+                const builtWord = currentBuild.join(''); // Join without hyphens
+                const match = correctWords.find(w => w.word === builtWord);
+                
+                if (match && !match.completed) {
+                    match.completed = true;
+                    completedWords++;
+                    
+                    const completed = document.getElementById('wordsCompleted');
+                    const wordDiv = document.createElement('div');
+                    wordDiv.style.cssText = 'background: var(--success); color: white; padding: 0.8rem; border-radius: 10px; margin: 0.5rem 0; font-weight: 600; animation: popIn 0.3s ease;';
+                    wordDiv.textContent = `✓ ${builtWord} - Correct!`;
+                    completed.appendChild(wordDiv);
+                    
+                    currentBuild = [];
+                    updateBuildZone();
+                    
+                    if (completedWords === correctWords.length) {
+                        scoreDisplay.innerHTML = '<div class="score-display">🎉 Amazing! You built all the words!</div>';
+                    }
+                } else if (match && match.completed) {
+                    const completed = document.getElementById('wordsCompleted');
+                    const msgDiv = document.createElement('div');
+                    msgDiv.style.cssText = 'background: rgba(247, 184, 1, 0.2); color: var(--text); padding: 0.8rem; border-radius: 10px; margin: 0.5rem 0; font-weight: 600; border: 2px solid var(--accent);';
+                    msgDiv.textContent = `⚠️ You already made "${builtWord}"! Try another combination.`;
+                    completed.appendChild(msgDiv);
+                    
+                    currentBuild = [];
+                    updateBuildZone();
+                } else {
+                    const completed = document.getElementById('wordsCompleted');
+                    const msgDiv = document.createElement('div');
+                    msgDiv.style.cssText = 'background: rgba(231, 76, 60, 0.2); color: #C0392B; padding: 0.8rem; border-radius: 10px; margin: 0.5rem 0; font-weight: 600; border: 2px solid #E74C3C;';
+                    msgDiv.textContent = `✗ "${builtWord}" is not one of the target words. Try a different combination!`;
+                    completed.appendChild(msgDiv);
+                    
+                    currentBuild = [];
+                    updateBuildZone();
+                }
+            };
+            
+            window.clearBuild = function() {
+                currentBuild = [];
+                updateBuildZone();
+            };
+        }
+
+        function initMatchingPuzzle(containerId, pairs) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            let matched = 0;
+            
+            let html = '<div style="display: grid; gap: 1rem;">';
+            
+            pairs.forEach((pair, idx) => {
+                html += `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: center;">
+                        <div class="quiz-option" style="background: rgba(155, 81, 224, 0.1); cursor: default;">
+                            ${pair.prefix} + ?
+                        </div>
+                        <select id="match${idx}" style="padding: 1rem; border-radius: 10px; border: 2px solid var(--secondary); font-size: 1rem; cursor: pointer;">
+                            <option value="">Choose root...</option>
+                            ${pairs.map(p => `<option value="${p.root}">${p.root}</option>`).join('')}
+                        </select>
+                    </div>
+                `;
+            });
+            
+            html += '</div><button class="try-again-btn" onclick="checkMatches()" style="margin-top: 1rem;">Check Answers</button><div id="matchScore"></div>';
+            container.innerHTML = html;
+            
+            window.checkMatches = function() {
+                let correct = 0;
+                pairs.forEach((pair, idx) => {
+                    const select = document.getElementById(`match${idx}`);
+                    if (select.value === pair.root) {
+                        correct++;
+                        select.style.background = 'var(--success)';
+                        select.style.color = 'white';
+                    } else {
+                        select.style.background = '#E74C3C';
+                        select.style.color = 'white';
+                    }
+                    select.disabled = true;
+                });
+                
+                document.getElementById('matchScore').innerHTML = 
+                    `<div class="score-display">You got ${correct} out of ${pairs.length} correct!</div>`;
+            };
+        }
+
+        function initScramblePuzzle(containerId, scrambles) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            let currentIdx = 0;
+            let startTime = Date.now();
+            let score = 0;
+            
+            function showScramble() {
+                if (currentIdx >= scrambles.length) {
+                    const totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
+                    container.innerHTML = `
+                        <div class="score-display">
+                            🎉 You unscrambled all ${scrambles.length} words in ${totalTime} seconds!<br>
+                            Score: ${score} correct on first try!
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const current = scrambles[currentIdx];
+                container.innerHTML = `
+                    <div style="background: rgba(155, 81, 224, 0.15); padding: 2rem; border-radius: 15px; margin-bottom: 1rem;">
+                        <div style="font-size: 2rem; font-weight: 700; text-align: center; color: var(--purple); letter-spacing: 0.3rem; margin-bottom: 1rem;">
+                            ${current.scrambled.toUpperCase()}
+                        </div>
+                        <p style="text-align: center; color: #666;">Word ${currentIdx + 1} of ${scrambles.length}</p>
+                    </div>
+                    
+                    <input type="text" id="scrambleInput" 
+                        style="width: 100%; padding: 1rem; font-size: 1.2rem; border: 3px solid var(--secondary); border-radius: 10px; text-align: center; font-weight: 600;"
+                        placeholder="Type your answer..."
+                        onkeypress="if(event.key==='Enter') checkScramble()">
+                    
+                    <button class="try-again-btn" onclick="checkScramble()" style="width: 100%; margin-top: 1rem;">Submit Answer</button>
+                    
+                    <div id="scrambleFeedback" style="margin-top: 1rem;"></div>
+                `;
+                
+                document.getElementById('scrambleInput').focus();
+            }
+            
+            window.checkScramble = function() {
+                const input = document.getElementById('scrambleInput');
+                const feedback = document.getElementById('scrambleFeedback');
+                const current = scrambles[currentIdx];
+                
+                if (input.value.toLowerCase().trim() === current.answer) {
+                    if (!current.attempted) {
+                        score++;
+                        current.attempted = true;
+                    }
+                    feedback.innerHTML = '<div style="background: var(--success); color: white; padding: 1rem; border-radius: 10px; font-weight: 600; text-align: center;">✓ Correct!</div>';
+                    setTimeout(() => {
+                        currentIdx++;
+                        showScramble();
+                    }, 1000);
+                } else {
+                    current.attempted = true;
+                    feedback.innerHTML = '<div style="background: #E74C3C; color: white; padding: 1rem; border-radius: 10px; font-weight: 600; text-align: center;">✗ Try again!</div>';
+                    input.value = '';
+                    input.focus();
+                }
+            };
+            
+            showScramble();
+        }
+
+        function initEtymology() {
+            if (currentActivityKey === '1-2') {
+                const quizData = [
+                    { question: 'Which language gave us "create"?', options: ['Latin', 'Greek', 'Old English', 'French'], correct: 0 },
+                    { question: 'Where does "make" come from?', options: ['Latin', 'Greek', 'Old English', 'French'], correct: 2 },
+                    { question: 'Which language family includes "parade"?', options: ['Latin', 'Greek', 'Old English', 'French'], correct: 3 }
+                ];
+                initEtymQuiz('etymologyQuiz1', quizData);
+            } else if (currentActivityKey === '2-2') {
+                const quizData = [
+                    { question: 'What does the Greek root "micro-" mean?', options: ['Large', 'Small', 'Round', 'Fast'], correct: 1 },
+                    { question: 'What does "-scope" mean in Greek?', options: ['To hear', 'To see', 'To touch', 'To smell'], correct: 1 },
+                    { question: 'What is the opposite of "micro-"?', options: ['mini-', 'mega-', 'macro-', 'maxi-'], correct: 2 }
+                ];
+                initEtymQuiz('microEtymQuiz', quizData);
+            } else if (currentActivityKey === '3-3') {
+                const quizData = [
+                    { question: 'Latin "creare" means:', options: ['to destroy', 'to make', 'to see', 'to speak'], correct: 1 },
+                    { question: 'Latin "educare" means:', options: ['to lead out', 'to follow', 'to hide', 'to find'], correct: 0 },
+                    { question: 'When did English borrow -ate words from Latin?', options: ['Ancient times', 'Middle Ages', 'Renaissance (1400s-1600s)', 'Modern era'], correct: 2 }
+                ];
+                initEtymQuiz('ateEtymQuiz', quizData);
+            } else if (currentActivityKey === '1-3') {
+                const quizData = [
+                    { question: 'Which language did "key" come from?', options: ['Latin', 'Greek', 'Old English', 'French'], correct: 2 },
+                    { question: 'Which language did "monkey" originally come from?', options: ['Spanish/Portuguese', 'Greek', 'Old English', 'German'], correct: 0 },
+                    { question: 'Which word comes from French?', options: ['key', 'honey', 'valley', 'they'], correct: 2 }
+                ];
+                initEtymQuiz('etymQuiz13', quizData);
+            } else if (currentActivityKey === '2-3') {
+                const quizData = [
+                    { question: 'What does Latin "cum" (CON-) mean?', options: ['against', 'with/together', 'before', 'after'], correct: 1 },
+                    { question: 'Which variation is used before the letter L?', options: ['con-', 'com-', 'col-', 'cor-'], correct: 2 },
+                    { question: 'Which variation is used before B, M, or P?', options: ['con-', 'com-', 'col-', 'cor-'], correct: 1 }
+                ];
+                initEtymQuiz('etymQuiz23', quizData);
+            } else if (currentActivityKey === '3-2') {
+                const quizData = [
+                    { question: 'When did the TI/CI → /sh/ sound change happen?', options: ['Ancient Rome', 'Norman French influence (1066+)', 'Modern times', 'Never changed'], correct: 1 },
+                    { question: 'Which suffix uses TI as /sh/?', options: ['-ful', '-tion', '-ness', '-ly'], correct: 1 },
+                    { question: 'What does Latin "natio" become in English?', options: ['nation (nay-shun)', 'native', 'natural', 'natal'], correct: 0 }
+                ];
+                initEtymQuiz('etymQuiz32', quizData);
+            }
+        }
+
+
+        function initEtymQuiz(containerId, quizData) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            let currentQ = 0;
+            let score = 0;
+            
+            function showQuestion() {
+                if (currentQ >= quizData.length) {
+                    container.innerHTML = `<div class="score-display">🎉 Quiz Complete! You got ${score} out of ${quizData.length} correct!</div>`;
+                    return;
+                }
+                
+                const q = quizData[currentQ];
+                let html = `<div style="margin-bottom: 1.5rem;"><strong style="font-size: 1.2rem; color: var(--secondary);">Question ${currentQ + 1}:</strong> ${q.question}</div>`;
+                
+                q.options.forEach((option, idx) => {
+                    html += `<div class="quiz-option" onclick="checkQuizAnswer(${idx}, ${q.correct}, ${currentQ})">${option}</div>`;
+                });
+                
+                container.innerHTML = html;
+            }
+            
+            window.checkQuizAnswer = function(selected, correct, qNum) {
+                if (qNum !== currentQ) return;
+                
+                const options = document.querySelectorAll('.quiz-option');
+                options[selected].classList.add(selected === correct ? 'correct' : 'wrong');
+                if (selected === correct) score++;
+                
+                options.forEach(opt => opt.style.pointerEvents = 'none');
+                
+                setTimeout(() => {
+                    currentQ++;
+                    showQuestion();
+                }, 1500);
+            };
+            
+            showQuestion();
+        }
+
+        function initChallenge() {
+            if (currentActivityKey === '3-3') {
+                const challenges = [
+                    {
+                        verb: 'create',
+                        answers: {
+                            noun: 'creation',
+                            agent: 'creator',
+                            adjective: 'creative',
+                            adverb: 'creatively'
+                        },
+                        latin: 'creare (to make/produce)'
+                    },
+                    {
+                        verb: 'educate',
+                        answers: {
+                            noun: 'education',
+                            agent: 'educator',
+                            adjective: 'educational',
+                            adverb: 'educationally'
+                        },
+                        latin: 'educare (to lead out/train)'
+                    },
+                    {
+                        verb: 'investigate',
+                        answers: {
+                            noun: 'investigation',
+                            agent: 'investigator',
+                            adjective: 'investigative',
+                            adverb: 'investigatively'
+                        },
+                        latin: 'investigare (to track/search)'
+                    }
+                ];
+                
+                initChallengeGame('challengeGame', challenges);
+            }
+        }
+
+        function initChallengeGame(containerId, challenges) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            let html = '';
+            
+            challenges.forEach((challenge, idx) => {
+                html += `
+                    <div style="background: rgba(155, 81, 224, 0.1); padding: 1.5rem; border-radius: 15px; margin-bottom: 2rem; border: 3px solid var(--purple);">
+                        <h4 style="color: var(--purple); font-size: 1.5rem; margin-bottom: 1.5rem;">
+                            Word Family ${idx + 1}: ${challenge.verb}
+                        </h4>
+                        
+                        <div style="background: white; padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+                            <p style="font-weight: 600; margin-bottom: 0.5rem;">📖 Latin Origin:</p>
+                            <p style="color: #666;">${challenge.latin}</p>
+                        </div>
+                        
+                        <div style="display: grid; gap: 1rem;">
+                            <div>
+                                <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">
+                                    Noun (the act of):</label>
+                                <input type="text" id="challenge${idx}_noun" 
+                                       placeholder="e.g., creation"
+                                       style="width: 100%; padding: 0.8rem; border: 2px solid var(--secondary); border-radius: 8px; font-size: 1rem;">
+                            </div>
+                            
+                            <div>
+                                <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">
+                                    Agent Noun (person who does this):</label>
+                                <input type="text" id="challenge${idx}_agent" 
+                                       placeholder="e.g., creator"
+                                       style="width: 100%; padding: 0.8rem; border: 2px solid var(--secondary); border-radius: 8px; font-size: 1rem;">
+                            </div>
+                            
+                            <div>
+                                <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">
+                                    Adjective (describing word):</label>
+                                <input type="text" id="challenge${idx}_adjective" 
+                                       placeholder="e.g., creative"
+                                       style="width: 100%; padding: 0.8rem; border: 2px solid var(--secondary); border-radius: 8px; font-size: 1rem;">
+                            </div>
+                            
+                            <div>
+                                <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">
+                                    Adverb (describing how):</label>
+                                <input type="text" id="challenge${idx}_adverb" 
+                                       placeholder="e.g., creatively"
+                                       style="width: 100%; padding: 0.8rem; border: 2px solid var(--secondary); border-radius: 8px; font-size: 1rem;">
+                            </div>
+                        </div>
+                        
+                        <div id="challengeFeedback${idx}" style="margin-top: 1rem;"></div>
+                    </div>
+                `;
+            });
+            
+            html += '<button class="check-button" onclick="checkAllChallenges()" style="width: 100%; font-size: 1.2rem; padding: 1.2rem;">Check All Answers!</button>';
+            html += '<div id="challengeScore" style="margin-top: 1rem;"></div>';
+            
+            container.innerHTML = html;
+            
+            window.checkAllChallenges = function() {
+                let totalCorrect = 0;
+                let totalQuestions = challenges.length * 4;
+                
+                challenges.forEach((challenge, idx) => {
+                    const inputs = {
+                        noun: document.getElementById(`challenge${idx}_noun`),
+                        agent: document.getElementById(`challenge${idx}_agent`),
+                        adjective: document.getElementById(`challenge${idx}_adjective`),
+                        adverb: document.getElementById(`challenge${idx}_adverb`)
+                    };
+                    
+                    let feedbackHtml = '<div style="margin-top: 1rem;">';
+                    
+                    Object.keys(inputs).forEach(key => {
+                        const input = inputs[key];
+                        const userAnswer = input.value.trim().toLowerCase();
+                        const correctAnswer = challenge.answers[key].toLowerCase();
+                        
+                        if (userAnswer === correctAnswer) {
+                            input.style.borderColor = 'var(--success)';
+                            input.style.background = 'rgba(6, 167, 125, 0.1)';
+                            feedbackHtml += `<div style="color: var(--success); font-weight: 600;">✓ ${key}: Correct!</div>`;
+                            totalCorrect++;
+                        } else {
+                            input.style.borderColor = '#E74C3C';
+                            input.style.background = 'rgba(231, 76, 60, 0.1)';
+                            feedbackHtml += `<div style="color: #E74C3C; font-weight: 600;">✗ ${key}: The answer is "${challenge.answers[key]}"</div>`;
+                        }
+                    });
+                    
+                    feedbackHtml += '</div>';
+                    document.getElementById(`challengeFeedback${idx}`).innerHTML = feedbackHtml;
+                });
+                
+                const scoreDiv = document.getElementById('challengeScore');
+                const percentage = Math.round((totalCorrect / totalQuestions) * 100);
+                
+                let message = '';
+                if (percentage === 100) {
+                    message = '🏆 PERFECT! You\'re a Word Family Master!';
+                } else if (percentage >= 75) {
+                    message = '🌟 Excellent work! You\'re almost there!';
+                } else if (percentage >= 50) {
+                    message = '👍 Good effort! Keep studying those word patterns!';
+                } else {
+                    message = '💪 Keep practicing! Review the morphology section for help.';
+                }
+                
+                scoreDiv.innerHTML = `
+                    <div class="score-display">
+                        ${message}<br>
+                        Score: ${totalCorrect}/${totalQuestions} (${percentage}%)
+                    </div>
+                `;
+            };
+        }
+
+        // Load the home view
+        function loadHome() {
+            const groupSelector = document.getElementById('groupSelector');
+            
+            const groups = [
+                { num: 1, weeks: [
+                    {week: 2, title: 'a as /ai/'},
+                    {week: 3, title: 'ey as /ee/'},
+                    {week: 4, title: 'or as /schwa/'},
+                    {week: 5, title: 'a as /or/'},
+                    {week: 6, title: 'ar as /or/'},
+                    {week: 7, title: 'Multisyllabic'},
+                    {week: 9, title: 'ey, ea, eigh, aigh as /ai/'}
+                ]},
+                { num: 2, weeks: [
+                    {week: 2, title: 'Prefix con-'},
+                    {week: 3, title: 'Prefix micro-'},
+                    {week: 4, title: 'Suffix -ar'},
+                    {week: 5, title: 'Suffix -er'},
+                    {week: 6, title: 'Suffix -or'},
+                    {week: 7, title: 'Suffix -less'},
+                    {week: 9, title: 'Suffix -ist'}
+                ]},
+                { num: 3, weeks: [
+                    {week: 2, title: 'ti/ci as /sh/'},
+                    {week: 3, title: 'Suffix -ious'},
+                    {week: 4, title: 'Suffix -ate'},
+                    {week: 5, title: 'Suffix -ent'},
+                    {week: 6, title: 'Suffix -ment'},
+                    {week: 7, title: 'Suffix -ian'},
+                    {week: 9, title: 'Suffix -ory'}
+                ]}
+            ];
+
+            groups.forEach(group => {
+                const card = document.createElement('div');
+                card.className = 'group-card';
+                card.innerHTML = `
+                    <h3>Group ${group.num}</h3>
+                    <div class="week-grid">
+                        ${group.weeks.map(w => `
+                            <button class="week-button" onclick="showActivity(${group.num}, ${w.week})">
+                                Week ${w.week}<br><small style="font-size: 0.85rem; font-weight: 400;">${w.title}</small>
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+                groupSelector.appendChild(card);
+            });
+        }
+
+        function showActivity(group, week) {
+            document.getElementById('homeView').classList.add('hidden');
+            document.getElementById('activityView').classList.add('active');
+            
+            const activityKey = `${group}-${week}`;
+            currentActivityKey = activityKey;
+            const data = MORPHOLOGY_DATA[activityKey];
+            
+            if (!data) {
+                alert('Activity coming soon! This week will be added soon.');
+                goHome();
+                return;
+            }
+
+            let html = `
+                <div class="activity-header">
+                    <h2>Group ${group} - Week ${week}</h2>
+                    <p>${data.title}</p>
+                </div>
+                
+                <div class="section-tabs">
+                    <button class="tab-button active" onclick="switchSection(this, 'quickGames')">🎮 Quick Games</button>
+                    <button class="tab-button" onclick="switchSection(this, 'etymology')">📚 Etymology (Word Origins)</button>
+                    <button class="tab-button" onclick="switchSection(this, 'morphology')">🔤 Morphology (Word Parts)</button>
+                    <button class="tab-button" onclick="switchSection(this, 'puzzles')">🧩 Puzzles</button>
+                    ${group === 3 && data.challenge ? '<button class="tab-button" onclick="switchSection(this, \'challenge\')">⭐ Challenge</button>' : ''}
+                </div>
+                
+                <div id="sectionContainer"></div>
+            `;
+            
+            document.getElementById('activityContent').innerHTML = html;
+            currentActivityData = data;
+            
+            // Show initial section after a short delay to ensure DOM is ready
+            setTimeout(() => {
+                const firstButton = document.querySelector('.tab-button');
+                if (firstButton) {
+                    switchSection(firstButton, 'quickGames');
+                }
+            }, 50);
+            
+            window.scrollTo(0, 0);
+        }
+
+        let currentActivityData = null;
+
+        function switchSection(button, sectionName) {
+            // Update active tab
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            const container = document.getElementById('sectionContainer');
+            if (!currentActivityData || !currentActivityData[sectionName]) {
+                container.innerHTML = '<div class="teaching-box"><p>Content coming soon!</p></div>';
+                return;
+            }
+            
+            container.innerHTML = currentActivityData[sectionName];
+            
+            // Re-initialize any interactive elements after a short delay to ensure DOM is ready
+            setTimeout(() => {
+                if (sectionName === 'quickGames') initQuickGames();
+                if (sectionName === 'etymology') initEtymology();
+                if (sectionName === 'morphology') initMorphology();
+                if (sectionName === 'puzzles') initPuzzles();
+                if (sectionName === 'challenge') initChallenge();
+            }, 100);
+        }
+
+        function goHome() {
+            document.getElementById('activityView').classList.remove('active');
+            document.getElementById('homeView').classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        // Initialize on page load
+        loadHome();
+    </script>
+</body>
+</html>
